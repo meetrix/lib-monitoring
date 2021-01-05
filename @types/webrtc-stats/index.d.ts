@@ -4,16 +4,16 @@ declare module '@peermetrics/webrtc-stats' {
   import { EventEmitter } from 'events';
 
   interface WebRTCStatsConstructorOptions {
-    getStatsInterval: number
-    wrapRTCPeerConnection: boolean
-    rawStats: boolean
-    statsObject: boolean
-    filteredStats: boolean
-    compressStats: boolean
-    wrapGetUserMedia: boolean
-    wrapLegacyGetUserMedia: boolean
-    prefixesToWrap: string[]
-    debug: boolean
+    getStatsInterval?: number
+    wrapRTCPeerConnection?: boolean
+    rawStats?: boolean
+    statsObject?: boolean
+    filteredStats?: boolean
+    compressStats?: boolean
+    wrapGetUserMedia?: boolean
+    wrapLegacyGetUserMedia?: boolean
+    prefixesToWrap?: string[]
+    debug?: boolean
   }
 
   type TimelineTag = 'getUserMedia' | 'peer' | 'connection' | 'track' | 'datachannel' | 'stats'
