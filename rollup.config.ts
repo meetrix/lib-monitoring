@@ -4,6 +4,8 @@ import sourceMaps from 'rollup-plugin-sourcemaps'
 import camelCase from 'lodash.camelcase'
 import typescript from 'rollup-plugin-typescript2'
 import json from 'rollup-plugin-json'
+import eslint from '@rollup/plugin-eslint';
+import prettier from 'rollup-plugin-prettier';
 
 const pkg = require('./package.json')
 
@@ -34,5 +36,13 @@ export default {
 
     // Resolve source maps to the original source
     sourceMaps(),
+
+    // Eslint
+    eslint(),
+    prettier({
+      tabWidth: 2,
+      singleQuote: true,
+    }),
+
   ],
 }
