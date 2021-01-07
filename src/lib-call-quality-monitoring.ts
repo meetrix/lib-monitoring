@@ -16,7 +16,7 @@ export default class DummyClass {
       getStatsInterval: 5000
     });
 
-    const report = async (event: TimelineEvent) => {
+    const reportToBackend = async (event: TimelineEvent) => {
       try {
         const response = await axios.post(this.backendUrl, event);
       } catch (error) {
@@ -24,7 +24,7 @@ export default class DummyClass {
       }
     }
 
-    this.stats.on('getUserMedia', event => report(event));
+    this.stats.on('getUserMedia', event => reportToBackend(event));
   }
 
   addPeer (options: AddPeerOptions) {
