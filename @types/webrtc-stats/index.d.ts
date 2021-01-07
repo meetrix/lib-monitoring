@@ -3,7 +3,7 @@ declare module '@peermetrics/webrtc-stats' {
 
   import { EventEmitter } from 'events';
 
-  interface WebRTCStatsConstructorOptions {
+  export interface WebRTCStatsConstructorOptions {
     getStatsInterval?: number
     wrapRTCPeerConnection?: boolean
     rawStats?: boolean
@@ -18,7 +18,7 @@ declare module '@peermetrics/webrtc-stats' {
 
   type TimelineTag = 'getUserMedia' | 'peer' | 'connection' | 'track' | 'datachannel' | 'stats'
 
-  interface TimelineEvent {
+  export interface TimelineEvent {
     event: string
     tag: TimelineTag
     timestamp?: Date
@@ -31,7 +31,7 @@ declare module '@peermetrics/webrtc-stats' {
 
   }
 
-  interface AddPeerOptions {
+  export interface AddPeerOptions {
     pc: RTCPeerConnection
     peerId: string
   }

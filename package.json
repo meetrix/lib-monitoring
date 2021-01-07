@@ -118,6 +118,7 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "@peermetrics/webrtc-stats": "^2.2.3"
+    "@peermetrics/webrtc-stats": "^2.2.3",
+    "axios": "^0.21.1"
   }
 }

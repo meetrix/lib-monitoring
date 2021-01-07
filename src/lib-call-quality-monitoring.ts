@@ -2,8 +2,10 @@
   // import "core-js/fn/array.find"
   // ...
 
-import WebrtcStats  from '@peermetrics/webrtc-stats';
-import { MonitoringConstructorOptions, AddPeerOptions } from './types';
+import type { AddPeerOptions, TimelineEvent } from '@peermetrics/webrtc-stats';
+import WebrtcStats from '@peermetrics/webrtc-stats';
+import axios from 'axios';
+import type { MonitoringConstructorOptions } from './types';
 export default class DummyClass {
   backendUrl: string;
   stats: WebrtcStats
@@ -13,6 +15,14 @@ export default class DummyClass {
     this.stats = new WebrtcStats({
       getStatsInterval: 5000
     });
+
+    this.stats.on('getUserMedia', async (event: TimelineEvent) => {
+      try {
+        const response = await axios.post(this.backendUrl, event);
+      } catch (error) {
+
+      }
+    })
   }
 
   addPeer (options: AddPeerOptions) {
