@@ -16,13 +16,15 @@ export default class DummyClass {
       getStatsInterval: 5000
     });
 
-    this.stats.on('getUserMedia', async (event: TimelineEvent) => {
+    const report = async (event: TimelineEvent) => {
       try {
         const response = await axios.post(this.backendUrl, event);
       } catch (error) {
-
+        console.error('Meetrix:callQualityMonitor:', error);
       }
-    })
+    }
+
+    this.stats.on('getUserMedia', event => report(event));
   }
 
   addPeer (options: AddPeerOptions) {
