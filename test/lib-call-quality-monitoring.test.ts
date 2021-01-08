@@ -1,4 +1,4 @@
-import DummyClass from "../src/lib-call-quality-monitoring"
+import Monitor from "../src/lib-call-quality-monitoring"
 
 /**
  * Dummy test
@@ -8,7 +8,7 @@ describe("Dummy test", () => {
     expect(true).toBeTruthy()
   })
 
-  it("DummyClass is instantiable", () => {
-    expect(new DummyClass()).toBeInstanceOf(DummyClass)
+  it("Monitor is instantiable", () => {
+    expect(new Monitor({ backendUrl: 'https://meetrix.io'})).toBeInstanceOf(Monitor)
   })
 })
