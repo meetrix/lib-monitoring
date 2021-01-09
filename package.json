@@ -70,7 +70,10 @@
     },
     "collectCoverageFrom": [
       "src/*.{js,ts}"
-    ]
+    ],
+    "globals": {
+      "window": {}
+    }
   },
   "prettier": {
     "semi": false,
