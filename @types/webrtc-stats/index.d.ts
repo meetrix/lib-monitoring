@@ -68,7 +68,7 @@ declare module '@peermetrics/webrtc-stats' {
     payloadType: number
   }
 
-  class WebRTCStats extends EventEmitter {
+  export class WebRTCStats extends EventEmitter {
     private isEdge;
     private getStatsInterval;
     private monitoringSetInterval;
@@ -150,7 +150,5 @@ declare module '@peermetrics/webrtc-stats' {
     private addCustomEvent;
     private wrapGetDisplayMedia;
   }
-
-  export = WebRTCStats;
 
 }
