@@ -1,9 +1,9 @@
-import Monitor from "../src/lib-call-quality-monitoring"
+import Monitor from "./lib-call-quality-monitoring"
 
 /**
  * Dummy test
  */
-describe("Dummy test", () => {
+describe("Monitor Test", () => {
   it("works if true is truthy", () => {
     expect(true).toBeTruthy()
   })
