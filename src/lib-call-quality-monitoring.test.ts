@@ -1,4 +1,3 @@
-import { RTCPeerConnection } from 'wrtc'
 import Monitor from './lib-call-quality-monitoring'
 
 /**
