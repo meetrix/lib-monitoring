@@ -1,3 +1,4 @@
+const { RTCPeerConnection } = require('wrtc')
 import Monitor from './lib-call-quality-monitoring'
 
 /**
