@@ -71,9 +71,6 @@
     "collectCoverageFrom": [
       "src/*.{js,ts}"
     ],
-    "globals": {
-      "window": {}
-    },
     "setupFiles": [
       "./setup.jest.js"
     ]
