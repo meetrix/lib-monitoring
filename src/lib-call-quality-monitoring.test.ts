@@ -13,11 +13,14 @@ describe('Monitor Test', () => {
     expect(new Monitor({ backendUrl: 'https://meetrix.io' })).toBeInstanceOf(Monitor)
   })
 
-  it('Add peer to Monitor', () => {
+  it('Add peer to Monitor', async () => {
     const monitor = new Monitor({ backendUrl: 'https://meetrix.io' })
-    monitor.addPeer({
-      pc: new RTCPeerConnection(),
-      peerId: '1234'
-    })
+    const pc1 = new RTCPeerConnection()
+    const pc2 = new RTCPeerConnection()
+    monitor.addPeer({ pc: pc1, peerId: 'pc1' })
+    monitor.addPeer({ pc: pc2, peerId: 'pc2' })
+
+    const sdp1 = await pc1.createOffer()
+    console.log(sdp1)
   })
 })

@@ -73,7 +73,10 @@
     ],
     "globals": {
       "window": {}
-    }
+    },
+    "setupFiles": [
+      "./setup.jest.js"
+    ]
   },
   "prettier": {
     "semi": false,
