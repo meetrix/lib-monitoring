@@ -13,7 +13,18 @@ export default class Monitor {
     this.stats = new WebRTCStats({
       getStatsInterval: 5000
     })
-    this.stats.on('getUserMedia', (event: TimelineEvent) => this.api.report(event))
+    const events = [
+      'timeline',
+      'stats',
+      'getUserMedia',
+      'peer',
+      'track',
+      'connection',
+      'datachannel'
+    ]
+    events.forEach(eventName => {
+      this.stats.on(eventName, (event: TimelineEvent) => this.api.report(event))
+    })
   }
 
   addPeer(options: AddPeerOptions) {
