@@ -126,7 +126,7 @@
     "wrtc": "^0.4.6"
   },
   "dependencies": {
-    "@peermetrics/webrtc-stats": "^2.2.3",
+    "@peermetrics/webrtc-stats": "github:buddhikajay/webrtc-stats",
     "axios": "^0.21.1"
   }
 }
