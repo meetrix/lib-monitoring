@@ -38,7 +38,7 @@ export default {
     sourceMaps(),
 
     // Eslint
-    eslint(),
+    // eslint(),
     prettier({
       tabWidth: 2,
       singleQuote: true,
