@@ -11,7 +11,8 @@ export default class Monitor {
   constructor({ backendUrl }: MonitoringConstructorOptions) {
     this.api = new API(backendUrl)
     this.stats = new WebRTCStats({
-      getStatsInterval: 5000
+      getStatsInterval: 5000,
+      rawStats: true
     })
     const events = [
       'timeline',
@@ -22,8 +23,10 @@ export default class Monitor {
       'connection',
       'datachannel'
     ]
-    events.forEach(eventName => {
-      this.stats.on(eventName, (event: TimelineEvent) => this.api.report(event))
+    events.forEach(eventType => {
+      this.stats.on(eventType, (event: TimelineEvent) =>
+        this.api.report({ type: eventType, ...event })
+      )
     })
   }
 

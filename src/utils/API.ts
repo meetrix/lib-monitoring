@@ -1,19 +1,19 @@
-
-import axios from 'axios';
-import type { TimelineEvent } from '@peermetrics/webrtc-stats';
+import axios from 'axios'
+import { Report } from '../types'
 
 export default class API {
-  backendUrl: string;
+  backendUrl: string
 
   constructor(backendUrl: string) {
-    this.backendUrl = backendUrl;
+    this.backendUrl = backendUrl
   }
 
-  async report(event: TimelineEvent) {
+  async report(event: Report) {
     try {
-      const response = await axios.post(this.backendUrl, event);
+      const response = await axios.post(this.backendUrl, event)
+      console.log(response)
     } catch (error) {
-      console.error('Meetrix:callQualityMonitor:', error);
+      console.error('Meetrix:callQualityMonitor:', error)
     }
   }
 }
