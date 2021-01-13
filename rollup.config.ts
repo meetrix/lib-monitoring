@@ -9,7 +9,7 @@ const pkg = require('./package.json')
 
 const libraryName = 'lib-call-quality-monitoring'
 
-export default {
+export default [{
   input: `src/${libraryName}.ts`,
   output: [
     { file: pkg.main, name: camelCase(libraryName), format: 'umd', sourcemap: true },
@@ -35,4 +35,4 @@ export default {
     // Resolve source maps to the original source
     sourceMaps(),
   ],
-}
+}]
