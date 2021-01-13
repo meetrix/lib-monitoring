@@ -6,3 +6,7 @@
 ## Adding global variables for testing
 
 The tests run on `node` environment instead of the real browser environment. Because of that, some browser variables like `window`, WebRTC API are not available in test environment. Therefore, we have to setup them in `setup.jest.js`
+
+## How to run
+
+1. We are using a git repo `cd node_modules/\@peermetrics/webrtc-stats/ && npm install && npm run build && cd ../../../`
