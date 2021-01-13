@@ -34,7 +34,7 @@
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "lint-staged",
     "travis-deploy-once": "travis-deploy-once",
-    "serve": "npm run build && npm run copy && http-server dist",
+    "serve": "npm run copy && http-server dist",
     "copy": "cpy './src/index.html' './dist'"
   },
   "lint-staged": {
