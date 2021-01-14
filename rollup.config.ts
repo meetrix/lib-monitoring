@@ -19,6 +19,7 @@ const plugins = [
   // https://github.com/rollup/rollup-plugin-node-resolve#usage
   resolve({ browser: true }),
   // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
+  // The order is important: https://github.com/axios/axios/issues/1259
   commonjs(),
   // Resolve source maps to the original source
   sourceMaps(),
