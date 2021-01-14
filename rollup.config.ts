@@ -14,13 +14,12 @@ const plugins = [
   json(),
   // Compile TypeScript files
   typescript({ useTsconfigDeclarationDir: true }),
-  // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
-  commonjs(),
   // Allow node_modules resolution, so you can use 'external' to control
   // which external modules to include in the bundle
   // https://github.com/rollup/rollup-plugin-node-resolve#usage
-  resolve(),
-
+  resolve({ browser: true }),
+  // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
+  commonjs(),
   // Resolve source maps to the original source
   sourceMaps(),
 ]
