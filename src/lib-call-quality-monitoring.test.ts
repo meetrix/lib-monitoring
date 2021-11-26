@@ -30,7 +30,7 @@ describe('Monitor Test', () => {
 
     console.log(offer)
     monitor.addPeer({ pc: pc2, peerId: 'pc2' })
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       setTimeout(() => {
         resolve()
       }, 5000)

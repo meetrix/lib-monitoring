@@ -4,6 +4,11 @@ import sourceMaps from 'rollup-plugin-sourcemaps'
 import camelCase from 'lodash.camelcase'
 import typescript from 'rollup-plugin-typescript2'
 import json from 'rollup-plugin-json'
+import serve from 'rollup-plugin-serve'
+import livereload from 'rollup-plugin-livereload'
+import babel from '@rollup/plugin-babel'
+import replace from 'rollup-plugin-replace'
+import alias from '@rollup/plugin-alias'
 
 const pkg = require('./package.json')
 
@@ -23,26 +28,53 @@ const plugins = [
   commonjs(),
   // Resolve source maps to the original source
   sourceMaps(),
+  // Server from dist
+  serve({
+    contentBase: ['dist'],
+    openPage: '/',
+    port: 8080
+  }),
+
+  livereload(),
+  babel({
+    presets: [["@babel/preset-react", { runtime: "automatic" }]],
+  }),
+  // replace ENV config in react : https://github.com/rollup/rollup/issues/487#issuecomment-177596512
+  replace({
+    'process.env.NODE_ENV': JSON.stringify( 'production' )
+  }),
+  alias({
+    entries: [
+      { find: 'react', replacement: 'preact/compat' },
+      { find: 'react-dom/test-utils', replacement: 'preact/test-utils' },
+      { find: 'react-dom', replacement: 'preact/compat' },
+      { find: 'react/jsx-runtime', replacement: 'preact/jsx-runtime' }
+    ]
+  })
 ]
 
-export default [{
-  input: 'src/browser.mjs',
-  output: [{
-      file: pkg.browser,
-      format: 'iife'
-  }],
-  plugins
-},
-{
-  input: `src/${libraryName}.ts`,
-  output: [
-    { file: pkg.main, name: camelCase(libraryName), format: 'umd', sourcemap: true },
-    { file: pkg.module, format: 'es', sourcemap: true },
-  ],
-  // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
-  external: [],
-  watch: {
-    include: 'src/**',
+export default [
+  {
+    input: 'src/browser.mjs',
+    output: [
+      {
+        file: pkg.browser,
+        format: 'iife'
+      }
+    ],
+    plugins
   },
-  plugins,
-}]
+  {
+    input: `src/${libraryName}.ts`,
+    output: [
+      { file: pkg.main, name: camelCase(libraryName), format: 'umd', sourcemap: true },
+      { file: pkg.module, format: 'es', sourcemap: true }
+    ],
+    // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
+    external: [],
+    watch: {
+      include: 'src/**'
+    },
+    plugins
+  }
+]
