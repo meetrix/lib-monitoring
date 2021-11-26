@@ -22,8 +22,8 @@
   "scripts": {
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --theme minimal src && npm run copy",
-    "start": "rollup -c rollup.config.ts -w",
+    "build": "tsc --module commonjs && npm run copy && rollup -c rollup.config.ts",
+    "start": "npm run copy && rollup -c rollup.config.ts -w",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
     "test:prod": "npm run lint && npm run test -- --no-cache",
@@ -34,8 +34,8 @@
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "lint-staged",
     "travis-deploy-once": "travis-deploy-once",
-    "serve": "npm run copy && http-server dist",
-    "copy": "cpy './src/index.html' './dist'"
+    "copy": "cpy './src/index.html' './dist'",
+    "generate-doc": "typedoc --out docs --theme minimal src"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
@@ -88,20 +88,21 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-react": "^7.16.0",
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
+    "@rollup/plugin-alias": "^3.1.8",
+    "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-eslint": "^8.0.1",
     "@types/debug": "^4.1.5",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.0",
-    "@types/webrtc": "0.0.26",
     "colors": "^1.3.2",
     "commitizen": "^3.0.0",
     "coveralls": "^3.0.2",
     "cpy-cli": "^3.1.1",
     "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.1.0",
-    "http-server": "^0.12.3",
     "husky": "^1.0.1",
     "jest": "^23.6.0",
     "jest-config": "^23.6.0",
@@ -111,27 +112,35 @@
     "prompt": "^1.0.0",
     "replace-in-file": "^3.4.2",
     "rimraf": "^2.6.2",
-    "rollup": "^0.67.0",
+    "rollup": "^1.32.1",
     "rollup-plugin-commonjs": "^9.1.8",
     "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-prettier": "^2.1.0",
+    "rollup-plugin-replace": "^2.2.0",
+    "rollup-plugin-serve": "^1.1.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
-    "rollup-plugin-typescript2": "^0.29.0",
+    "rollup-plugin-typescript2": "^0.31.1",
     "semantic-release": "^15.9.16",
     "shelljs": "^0.8.3",
     "travis-deploy-once": "^5.0.9",
     "ts-jest": "^23.10.2",
     "ts-node": "^7.0.1",
+    "tslib": "^2.3.1",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "tslint-config-standard": "^8.0.1",
     "typedoc": "^0.20.13",
-    "typescript": "^3.0.3",
+    "typescript": "^4.5.2",
     "wrtc": "^0.4.6"
   },
   "dependencies": {
+    "@emotion/react": "^11.6.0",
     "@peermetrics/webrtc-stats": "github:buddhikajay/webrtc-stats",
-    "axios": "^0.21.1"
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "axios": "^0.21.1",
+    "preact": "^10.6.0"
   }
 }

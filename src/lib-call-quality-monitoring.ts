@@ -3,18 +3,26 @@
 // ...
 import { WebRTCStats, AddPeerOptions, TimelineEvent } from '@peermetrics/webrtc-stats'
 import API from './utils/API'
-import { MonitoringConstructorOptions } from './types'
+import { mountUI, updateUI } from './ui'
+import { MonitoringConstructorOptions, EventTypes } from './types'
 export default class Monitor {
   stats: WebRTCStats
-  api: API
+  api: API | undefined
 
-  constructor({ backendUrl }: MonitoringConstructorOptions) {
-    this.api = new API(backendUrl)
+  constructor(options: MonitoringConstructorOptions) {
+    const { backendUrl } = options || {}
+    this.api = backendUrl ? new API(backendUrl) : undefined
     this.stats = new WebRTCStats({
       getStatsInterval: 5000,
-      rawStats: true
+      rawStats: true,
+      statsObject: false,
+      filteredStats: false,
+      wrapGetUserMedia: true,
+      debug: false,
+      remote: false,
+      logLevel: 'error'
     })
-    const events = [
+    const events: EventTypes[] = [
       'timeline',
       'stats',
       'getUserMedia',
@@ -24,13 +32,20 @@ export default class Monitor {
       'datachannel'
     ]
     events.forEach(eventType => {
-      this.stats.on(eventType, (event: TimelineEvent) =>
-        this.api.report({ type: eventType, ...event })
-      )
+      this.stats.on(eventType, (event: TimelineEvent) => {
+        if (this.api) {
+          this.api.report({ type: eventType, ...event })
+        }
+      })
     })
   }
 
   addPeer(options: AddPeerOptions) {
     this.stats.addPeer(options)
+  }
+
+  UI() {
+    mountUI()
+    updateUI()
   }
 }

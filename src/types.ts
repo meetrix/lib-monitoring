@@ -3,6 +3,15 @@ export interface MonitoringConstructorOptions {
   backendUrl: string
 }
 
+export type EventTypes =
+  | 'timeline'
+  | 'stats'
+  | 'getUserMedia'
+  | 'peer'
+  | 'track'
+  | 'connection'
+  | 'datachannel'
 export interface Report extends TimelineEvent {
-  type: string
+  type: EventTypes
+  conferenceId?: string
 }
