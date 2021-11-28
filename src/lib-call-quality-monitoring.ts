@@ -5,6 +5,9 @@ import { WebRTCStats, AddPeerOptions, TimelineEvent } from '@peermetrics/webrtc-
 import API from './utils/API'
 import { mountUI, updateUI } from './ui'
 import { MonitoringConstructorOptions, EventTypes } from './types'
+import store from './ui/store'
+import { addPeerConnected } from './ui/store/actions'
+import { handleReport } from './utils/LocalReport'
 export default class Monitor {
   stats: WebRTCStats
   api: API | undefined
@@ -23,18 +26,22 @@ export default class Monitor {
       logLevel: 'error'
     })
     const events: EventTypes[] = [
-      'timeline',
-      'stats',
-      'getUserMedia',
-      'peer',
-      'track',
-      'connection',
-      'datachannel'
+      // 'timeline',
+      'stats'
+      // 'getUserMedia',
+      // 'peer',
+      // 'track',
+      // 'connection',
+      // 'datachannel'
     ]
     events.forEach(eventType => {
       this.stats.on(eventType, (event: TimelineEvent) => {
+        console.log(eventType, event)
         if (this.api) {
           this.api.report({ type: eventType, ...event })
+        }
+        if (eventType === 'stats') {
+          handleReport(event)
         }
       })
     })
@@ -42,6 +49,7 @@ export default class Monitor {
 
   addPeer(options: AddPeerOptions) {
     this.stats.addPeer(options)
+    // addPeerConnected({ peerId: options.peerId })
   }
 
   UI() {

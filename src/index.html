@@ -13,7 +13,7 @@
 
       <script src="browser.js"></script>
       <script>
-          window.rtcMonitor = new Monitor({ backendUrl: 'http://localhost:9100/v1/stats/peer' });
+          window.rtcMonitor = new Monitor() // new Monitor({ backendUrl: 'http://localhost:9100/v1/stats/peer' });
           window.rtcMonitor.UI();
       </script>
 
