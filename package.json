@@ -1,6 +1,6 @@
 {
   "name": "lib-call-quality-monitoring",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "keywords": [],
   "main": "dist/lib-call-quality-monitoring.umd.js",
