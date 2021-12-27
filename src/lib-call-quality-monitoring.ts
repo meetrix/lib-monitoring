@@ -13,8 +13,8 @@ export default class Monitor {
   api: API | undefined
 
   constructor(options: MonitoringConstructorOptions) {
-    const { backendUrl } = options || {}
-    this.api = backendUrl ? new API(backendUrl) : undefined
+    const { token } = options || {}
+    this.api = token ? new API({ token }) : undefined
     this.stats = new WebRTCStats({
       getStatsInterval: 5000,
       rawStats: true,

@@ -1,7 +1,6 @@
 import { TimelineEvent, TrackReport } from '@peermetrics/webrtc-stats'
-export interface MonitoringConstructorOptions {
-  backendUrl: string
-}
+import { ApiOptions } from '../src/utils/API'
+export interface MonitoringConstructorOptions extends ApiOptions {}
 
 export type EventTypes =
   | 'timeline'
@@ -30,7 +29,6 @@ export interface TrackReportExtended extends TrackReport {
   fecPacketsDiscarded?: number
   fecPacketsReceived?: number
   headerBytesReceived?: number
-  id?: string
   insertedSamplesForDeceleration?: number
   jitter?: number
   jitterBufferDelay?: number
@@ -48,13 +46,11 @@ export interface TrackReportExtended extends TrackReport {
   removedSamplesForAcceleration?: number
   silentConcealedSamples?: number
   ssrc?: number
-  timestamp?: number
   totalAudioEnergy?: number
   totalSamplesDuration?: number
   totalSamplesReceived?: number
   trackId?: string
   transportId?: string
-  type?: RTCStatsType
 }
 
 export interface ConnectionReport {
