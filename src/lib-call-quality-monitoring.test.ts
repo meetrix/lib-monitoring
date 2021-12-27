@@ -4,19 +4,21 @@ import Monitor from './lib-call-quality-monitoring'
 // import API from './utils/API';
 // jest.mock('./utils/API');
 
+const TOKEN = 'xxxxxx'
+
 describe('Monitor Test', () => {
   it('works if true is truthy', () => {
     expect(true).toBeTruthy()
   })
 
   it('Monitor is instantiable', () => {
-    const monitor = new Monitor({ backendUrl: 'https://meetrix.io' })
+    const monitor = new Monitor({ token: TOKEN })
     expect(monitor).toBeInstanceOf(Monitor)
     // expect(API).toHaveBeenCalledTimes(1);
   })
 
   it('Add peer to Monitor', async () => {
-    const monitor = new Monitor({ backendUrl: 'http://localhost:9100/v1/stats/peer' })
+    const monitor = new Monitor({ token: TOKEN })
     const pc1 = new RTCPeerConnection()
     const pc2 = new RTCPeerConnection()
     monitor.addPeer({ pc: pc1, peerId: 'pc1' })

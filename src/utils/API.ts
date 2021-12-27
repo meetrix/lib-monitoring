@@ -1,17 +1,30 @@
-import axios from 'axios'
+import io, { Socket, SocketOptions, ManagerOptions } from 'socket.io-client'
+import { BACKEND_URL, SOCKET_PATH } from '../config'
 import { Report } from '../types'
 
-export default class API {
-  backendUrl: string
+export interface ApiOptions {
+  token: string
+  options?: SocketOptions & ManagerOptions
+}
 
-  constructor(backendUrl: string) {
-    this.backendUrl = backendUrl
+export default class API {
+  socket?: Socket
+
+  constructor({ token, options }: ApiOptions) {
+    this.socket = io(BACKEND_URL, {
+      path: SOCKET_PATH,
+      auth: {
+        token
+      },
+      ...options
+    })
   }
 
   async report(event: Report) {
     try {
-      const response = await axios.post(this.backendUrl, event)
-      console.log(response)
+      if (this.socket) {
+        this.socket?.emit('report', event)
+      }
     } catch (error) {
       console.error('Meetrix:callQualityMonitor:', error)
     }

@@ -9,6 +9,9 @@ import livereload from 'rollup-plugin-livereload'
 import babel from '@rollup/plugin-babel'
 import replace from 'rollup-plugin-replace'
 import alias from '@rollup/plugin-alias'
+import dotenv from 'dotenv';
+
+dotenv.config({ path: './.env' });
 
 const pkg = require('./package.json')
 
@@ -41,7 +44,7 @@ const plugins = [
   }),
   // replace ENV config in react : https://github.com/rollup/rollup/issues/487#issuecomment-177596512
   replace({
-    'process.env.NODE_ENV': JSON.stringify( 'production' )
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
   }),
   alias({
     entries: [
