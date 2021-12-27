@@ -4,17 +4,21 @@ import { Report } from '../types'
 
 export interface ApiOptions {
   token: string
+  clientId: string
   options?: SocketOptions & ManagerOptions
 }
 
 export default class API {
   socket?: Socket
 
-  constructor({ token, options }: ApiOptions) {
+  constructor({ token, clientId, options }: ApiOptions) {
     this.socket = io(BACKEND_URL, {
       path: SOCKET_PATH,
       auth: {
         token
+      },
+      query: {
+        clientId
       },
       ...options
     })

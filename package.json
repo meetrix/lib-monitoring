@@ -142,6 +142,7 @@
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "axios": "^0.21.1",
+    "nanoid": "^3.1.30",
     "preact": "^10.6.0",
     "socket.io-client": "^4.4.0",
     "unistore": "^3.5.2"

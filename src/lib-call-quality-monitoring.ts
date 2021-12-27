@@ -2,19 +2,31 @@
 // import "core-js/fn/array.find"
 // ...
 import { WebRTCStats, AddPeerOptions, TimelineEvent } from '@peermetrics/webrtc-stats'
+import { nanoid } from 'nanoid'
 import API from './utils/API'
 import { mountUI, updateUI } from './ui'
 import { MonitoringConstructorOptions, EventTypes } from './types'
 import store from './ui/store'
 import { addPeerConnected } from './ui/store/actions'
 import { handleReport } from './utils/LocalReport'
+import { getClientId, setClientId } from './utils/localStorageUtils'
 export default class Monitor {
   stats: WebRTCStats
   api: API | undefined
+  clientId: string
 
   constructor(options: MonitoringConstructorOptions) {
-    const { token } = options || {}
-    this.api = token ? new API({ token }) : undefined
+    const { token, clientId } = options || {}
+    const _clientId = clientId || getClientId()
+    if (_clientId) {
+      this.clientId = _clientId
+    } else {
+      // if there is no client id, use a random value
+      const newClientId = nanoid()
+      setClientId(newClientId)
+      this.clientId = newClientId
+    }
+    this.api = token ? new API({ token, clientId: this.clientId }) : undefined
     this.stats = new WebRTCStats({
       getStatsInterval: 5000,
       rawStats: true,
@@ -34,6 +46,9 @@ export default class Monitor {
       // 'connection',
       // 'datachannel'
     ]
+
+    getClientId()
+
     events.forEach(eventType => {
       this.stats.on(eventType, (event: TimelineEvent) => {
         console.log(eventType, event)
@@ -47,8 +62,8 @@ export default class Monitor {
     })
   }
 
-  addPeer(options: AddPeerOptions) {
-    this.stats.addPeer(options)
+  addPeer(addPeerOptions: AddPeerOptions) {
+    this.stats.addPeer(addPeerOptions)
     // addPeerConnected({ peerId: options.peerId })
   }
 

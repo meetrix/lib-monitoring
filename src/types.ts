@@ -1,6 +1,9 @@
 import { TimelineEvent, TrackReport } from '@peermetrics/webrtc-stats'
-import { ApiOptions } from '../src/utils/API'
-export interface MonitoringConstructorOptions extends ApiOptions {}
+export { ApiOptions } from '../src/utils/API'
+export interface MonitoringConstructorOptions {
+  token: string
+  clientId?: string
+}
 
 export type EventTypes =
   | 'timeline'
