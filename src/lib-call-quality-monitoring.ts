@@ -1,25 +1,27 @@
 // Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
 // import "core-js/fn/array.find"
 // ...
-import { WebRTCStats, AddPeerOptions, TimelineEvent } from '@peermetrics/webrtc-stats'
+import { AddPeerOptions, TimelineEvent, WebRTCStats } from '@peermetrics/webrtc-stats'
 import { nanoid } from 'nanoid'
-import API from './utils/API'
+import { EventTypes, MonitoringConstructorOptions } from './types'
 import { mountUI, updateUI } from './ui'
-import { MonitoringConstructorOptions, EventTypes } from './types'
-import store from './ui/store'
-import { addPeerConnected } from './ui/store/actions'
-import { handleReport } from './utils/LocalReport'
+import API from './utils/API'
+import { getReportFromTimelineEvent, handleReport } from './utils/LocalReport'
 import { getClientId, setClientId } from './utils/localStorageUtils'
+import { getUrlParams } from './utils/urlUtils'
 export default class Monitor {
   stats: WebRTCStats
   api: API | undefined
   clientId: string
 
   constructor(options: MonitoringConstructorOptions) {
-    const { token, clientId } = options || {}
-    const _clientId = clientId || getClientId()
-    if (_clientId) {
-      this.clientId = _clientId
+    const { token: _token, clientId: _clientId } = options || {}
+    // allow overriding via url parameters
+    const { clientId: urlClientId, token: urlToken } = getUrlParams()
+    const clientId = urlClientId || _clientId || getClientId()
+    const token = urlToken || _token
+    if (clientId) {
+      this.clientId = clientId
     } else {
       // if there is no client id, use a random value
       const newClientId = nanoid()
@@ -51,12 +53,13 @@ export default class Monitor {
 
     events.forEach(eventType => {
       this.stats.on(eventType, (event: TimelineEvent) => {
-        console.log(eventType, event)
+        const report = getReportFromTimelineEvent(event)
+        // console.log('---- report ----', report);
         if (this.api) {
-          this.api.report({ type: eventType, ...event })
+          this.api.report(report)
         }
         if (eventType === 'stats') {
-          handleReport(event)
+          handleReport(report)
         }
       })
     })
