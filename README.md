@@ -9,11 +9,18 @@ The tests run on `node` environment instead of the real browser environment. Bec
 
 ## How to run
 
-1. We are using a git repo for `webrtc-stats` and we have to build that manually for now.  `cd node_modules/\@peermetrics/webrtc-stats/ && npm install && npm run build && cd ../../../`
-2. `npm run start`
+1. `npm install`
+2. `npm start`
+3. Make sure you have started the `webrtc-monitoring-backend`
+4. Visit [http://localhost:8080/?clientId=1234] to set the clientId and start a call
 
 ## Building production bundle
 
 Run `npm run build`
 
 Please note that this command might not exit because of `rollup-plugin-livereload`
+
+
+## URL Parameters
+
+[http://localhost:8080/?mockStats=true&clientId=1234&token=x.x.x]

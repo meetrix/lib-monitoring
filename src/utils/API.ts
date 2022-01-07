@@ -1,6 +1,7 @@
 import io, { Socket, SocketOptions, ManagerOptions } from 'socket.io-client'
+import { TimelineEvent } from '@peermetrics/webrtc-stats'
 import { BACKEND_URL, SOCKET_PATH } from '../config'
-import { Report } from '../types'
+import { Report } from '@meetrix/webrtc-monitoring-common-lib'
 
 export interface ApiOptions {
   token: string
@@ -24,10 +25,12 @@ export default class API {
     })
   }
 
-  async report(event: Report) {
+  async report(report: Report) {
     try {
       if (this.socket) {
-        this.socket?.emit('report', event)
+        const customReport = report.data
+
+        this.socket?.emit(report.event, report)
       }
     } catch (error) {
       console.error('Meetrix:callQualityMonitor:', error)
