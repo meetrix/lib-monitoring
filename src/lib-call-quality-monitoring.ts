@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid'
 import { EventTypes, MonitoringConstructorOptions } from './types'
 import { mountUI, updateUI } from './ui'
 import API from './utils/API'
-import { getReportFromTimelineEvent, handleReport } from './utils/LocalReport'
+import { getReportFromTimelineEvent, handleReport } from './utils/localReport'
 import { getClientId, setClientId } from './utils/localStorageUtils'
 import { getUrlParams } from './utils/urlUtils'
 export default class Monitor {

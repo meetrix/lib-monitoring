@@ -34,7 +34,7 @@
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "lint-staged",
     "travis-deploy-once": "travis-deploy-once",
-    "copy": "cpy './src/index.html' './dist'",
+    "copy": "cpy ./src/index.html ./dist",
     "generate-doc": "typedoc --out docs --theme minimal src"
   },
   "lint-staged": {
@@ -138,10 +138,10 @@
   },
   "dependencies": {
     "@emotion/react": "^11.6.0",
+    "@meetrix/webrtc-monitoring-common-lib": "git+https://gitlab.com/meetrix/products/webrtc-monitoring/webrtc-monitoring-common-lib.git#master",
     "@peermetrics/webrtc-stats": "github:buddhikajay/webrtc-stats",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
-    "@meetrix/webrtc-monitoring-common-lib": "git+https://gitlab.com/meetrix/products/webrtc-monitoring/webrtc-monitoring-common-lib.git#master",
     "axios": "^0.21.1",
     "nanoid": "^3.1.30",
     "preact": "^10.6.0",
