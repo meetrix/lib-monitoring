@@ -40,26 +40,36 @@ export default class Monitor {
       logLevel: 'error'
     })
     const events: EventTypes[] = [
-      // 'timeline',
-      'stats'
-      // 'getUserMedia',
-      // 'peer',
-      // 'track',
-      // 'connection',
-      // 'datachannel'
+      'timeline'
+      //'stats',
+      //'getUserMedia',
+      //'peer',
+      //'track',
+      //'connection',
+      //'datachannel'
     ]
 
     getClientId()
 
     events.forEach(eventType => {
-      this.stats.on(eventType, (event: TimelineEvent) => {
-        const report = getReportFromTimelineEvent(event)
-        // console.log('---- report ----', report);
-        if (this.api) {
-          this.api.report(report)
-        }
-        if (eventType === 'stats') {
+      this.stats.on(eventType, async (event: TimelineEvent) => {
+        if (event.event === 'stats') {
+          const report = await getReportFromTimelineEvent(event)
+          console.log('---- stats ----', report)
+          if (this.api) {
+            this.api.report(report)
+          }
           handleReport(report)
+        } else if (event.event === 'onconnectionstatechange') {
+          console.log('---- onconnectionstatechange ----', event)
+          if (this.api) {
+            this.api.connectionStats(event)
+          }
+        } else {
+          console.log('---- other ----', event)
+          if (this.api) {
+            this.api.other(event)
+          }
         }
       })
     })

@@ -9,18 +9,22 @@ export const getReportsOfDirection = (
 ) => {
   return [...statsObject.audio[direction], ...statsObject.video[direction]]
 }
-export const getPeerReportData = (statsObject: StatsObject): StatsObjectCustom => {
+export const getPeerReportData = async (statsObject: StatsObject): Promise<StatsObjectCustom> => {
+  const browserInfo = { userAgent: navigator.userAgent, platform: navigator.platform }
+  const mediaDeviceInfo = await navigator.mediaDevices.enumerateDevices()
   return {
     connection: statsObject.connection,
     inbound: getReportsOfDirection(statsObject, 'inbound'),
-    outbound: getReportsOfDirection(statsObject, 'outbound')
+    outbound: getReportsOfDirection(statsObject, 'outbound'),
+    browserInfo,
+    mediaDeviceInfo
   }
 }
 
-export const getReportFromTimelineEvent = (event: TimelineEvent): Report => {
+export const getReportFromTimelineEvent = async (event: TimelineEvent): Promise<Report> => {
   return {
     ...event,
-    data: getPeerReportData(event.data)
+    data: await getPeerReportData(event.data)
   }
 }
 

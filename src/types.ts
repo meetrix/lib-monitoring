@@ -87,10 +87,17 @@ export interface ConnectionReport {
   writable: true
 }
 
+export interface BrowserInfo {
+  userAgent: string
+  platform: string
+}
+
 export interface StatsObjectCustom {
   inbound: TrackReportExtended[]
   outbound: TrackReportExtended[]
   connection: ConnectionReport
+  browserInfo: BrowserInfo
+  mediaDeviceInfo: MediaDeviceInfo[]
 }
 
 export interface Peer extends StatsObjectCustom {

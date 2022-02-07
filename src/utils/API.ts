@@ -36,4 +36,24 @@ export default class API {
       console.error('Meetrix:callQualityMonitor:', error)
     }
   }
+
+  async connectionStats(connectionInfo: any) {
+    try {
+      if (this.socket) {
+        this.socket?.emit('connectionInfo', connectionInfo)
+      }
+    } catch (error) {
+      console.error('Meetrix:callQualityMonitor:', error)
+    }
+  }
+
+  async other(other: any) {
+    try {
+      if (this.socket) {
+        this.socket?.emit('other', other)
+      }
+    } catch (error) {
+      console.error('Meetrix:callQualityMonitor:', error)
+    }
+  }
 }
