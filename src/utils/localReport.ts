@@ -1,5 +1,5 @@
 import { StatsObject, TimelineEvent } from '@peermetrics/webrtc-stats'
-import { Report } from '@meetrix/webrtc-monitoring-common-lib'
+import { Connection, Other, Report } from '@meetrix/webrtc-monitoring-common-lib'
 import { StatsObjectCustom } from '../types'
 import { addPeerConnected } from '../ui/store/actions'
 
@@ -23,8 +23,31 @@ export const getPeerReportData = async (statsObject: StatsObject): Promise<Stats
 
 export const getReportFromTimelineEvent = async (event: TimelineEvent): Promise<Report> => {
   return {
-    ...event,
+    event: event.event,
+    peerId: event.peerId!,
+    tag: event.tag,
+    timestamp: event.timestamp,
     data: await getPeerReportData(event.data)
+  }
+}
+
+export const getConnectionFromTimelineEvent = async (event: TimelineEvent): Promise<Connection> => {
+  return {
+    event: event.event,
+    peerId: event.peerId!,
+    tag: event.tag,
+    timestamp: event.timestamp,
+    data: event.data
+  }
+}
+
+export const getOtherFromTimelineEvent = async (event: TimelineEvent): Promise<Other> => {
+  return {
+    event: event.event,
+    peerId: event.peerId!,
+    tag: event.tag,
+    timestamp: event.timestamp,
+    data: event.data
   }
 }
 

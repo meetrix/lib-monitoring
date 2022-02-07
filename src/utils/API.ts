@@ -1,7 +1,6 @@
 import io, { Socket, SocketOptions, ManagerOptions } from 'socket.io-client'
-import { TimelineEvent } from '@peermetrics/webrtc-stats'
 import { BACKEND_URL, SOCKET_PATH } from '../config'
-import { Report } from '@meetrix/webrtc-monitoring-common-lib'
+import { Report, Other, Connection } from '@meetrix/webrtc-monitoring-common-lib'
 
 export interface ApiOptions {
   token: string
@@ -28,8 +27,6 @@ export default class API {
   async report(report: Report) {
     try {
       if (this.socket) {
-        const customReport = report.data
-
         this.socket?.emit(report.event, report)
       }
     } catch (error) {
@@ -37,7 +34,7 @@ export default class API {
     }
   }
 
-  async connectionStats(connectionInfo: any) {
+  async connectionStats(connectionInfo: Connection) {
     try {
       if (this.socket) {
         this.socket?.emit('connectionInfo', connectionInfo)
@@ -47,7 +44,7 @@ export default class API {
     }
   }
 
-  async other(other: any) {
+  async other(other: Other) {
     try {
       if (this.socket) {
         this.socket?.emit('other', other)
