@@ -1,6 +1,6 @@
 package:
   stage: build
-  image: node:14
+  image: node:16
   script:
     - apt update
     - apt install -y bzip2 git
