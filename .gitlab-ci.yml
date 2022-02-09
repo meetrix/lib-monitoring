@@ -1,6 +1,6 @@
 package:
   stage: build
-  image: node:12-bullseye-slim
+  image: node:14
   script:
     - apt update
     - apt install -y bzip2 git
