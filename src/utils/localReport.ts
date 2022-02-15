@@ -31,26 +31,6 @@ export const getReportFromTimelineEvent = async (event: TimelineEvent): Promise<
   }
 }
 
-export const getConnectionFromTimelineEvent = async (event: TimelineEvent): Promise<Connection> => {
-  return {
-    event: event.event,
-    peerId: event.peerId!,
-    tag: event.tag,
-    timestamp: event.timestamp,
-    data: event.data
-  }
-}
-
-export const getOtherFromTimelineEvent = async (event: TimelineEvent): Promise<Other> => {
-  return {
-    event: event.event,
-    peerId: event.peerId!,
-    tag: event.tag,
-    timestamp: event.timestamp,
-    data: event.data
-  }
-}
-
 export const handleReport = ({ peerId, data }: Report) => {
   addPeerConnected({
     peerId: peerId || 'unknown',

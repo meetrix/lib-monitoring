@@ -1,6 +1,7 @@
 import io, { Socket, SocketOptions, ManagerOptions } from 'socket.io-client'
 import { BACKEND_URL, SOCKET_PATH } from '../config'
-import { Report, Other, Connection } from '@meetrix/webrtc-monitoring-common-lib'
+import { Report } from '@meetrix/webrtc-monitoring-common-lib'
+import { TimelineEvent } from '@peermetrics/webrtc-stats'
 
 export interface ApiOptions {
   token: string
@@ -34,7 +35,7 @@ export default class API {
     }
   }
 
-  async connectionStats(connectionInfo: Connection) {
+  async connectionStats(connectionInfo: TimelineEvent) {
     try {
       if (this.socket) {
         this.socket?.emit('connectionInfo', connectionInfo)
@@ -44,7 +45,7 @@ export default class API {
     }
   }
 
-  async other(other: Other) {
+  async other(other: TimelineEvent) {
     try {
       if (this.socket) {
         this.socket?.emit('other', other)

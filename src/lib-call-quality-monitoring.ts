@@ -6,12 +6,7 @@ import { nanoid } from 'nanoid'
 import { EventTypes, MonitoringConstructorOptions } from './types'
 import { mountUI, updateUI } from './ui'
 import API from './utils/API'
-import {
-  getConnectionFromTimelineEvent,
-  getOtherFromTimelineEvent,
-  getReportFromTimelineEvent,
-  handleReport
-} from './utils/localReport'
+import { getReportFromTimelineEvent, handleReport } from './utils/localReport'
 import { getClientId, setClientId } from './utils/localStorageUtils'
 import { getUrlParams } from './utils/urlUtils'
 export default class Monitor {
@@ -66,16 +61,14 @@ export default class Monitor {
           }
           handleReport(report)
         } else if (event.event === 'onconnectionstatechange') {
-          const connection = await getConnectionFromTimelineEvent(event)
-          console.log('---- onconnectionstatechange ----', connection)
+          console.log('---- onconnectionstatechange ----', event)
           if (this.api) {
-            this.api.connectionStats(connection)
+            this.api.connectionStats(event)
           }
         } else {
-          const other = await getOtherFromTimelineEvent(event)
-          console.log('---- other ----', other)
+          console.log('---- other ----', event)
           if (this.api) {
-            this.api.other(other)
+            this.api.other(event)
           }
         }
       })
