@@ -1,5 +1,5 @@
 import { StatsObject, TimelineEvent } from '@peermetrics/webrtc-stats'
-import { Connection, Other, Report } from '@meetrix/webrtc-monitoring-common-lib'
+import { Report } from '@meetrix/webrtc-monitoring-common-lib'
 import { StatsObjectCustom } from '../types'
 import { addPeerConnected } from '../ui/store/actions'
 
