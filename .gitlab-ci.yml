@@ -9,11 +9,11 @@ package:
     - npm install
     - cd node_modules/@peermetrics/webrtc-stats && npm install && npm run build
     - cd ../../.. && npm run build
-    - cd build
+    - cd dist
     - tar -cjSf lib-monitoring.tar.bz2 *
   artifacts:
     paths:
-      - build/lib-monitoring.tar.bz2
+      - dist/lib-monitoring.tar.bz2
   only:
     - feat/dashboard-log-devices-browserinfo
     - tags
@@ -30,7 +30,7 @@ staging_deploy:
   environment:
     name: staging
   script:
-    - scp -o StrictHostKeyChecking=no build/lib-monitoring.tar.bz2 $STAGING_SSH_USER@$STAGING_SSH_HOST:/var/www/lib-monitoring/releases/
+    - scp -o StrictHostKeyChecking=no dist/lib-monitoring.tar.bz2 $STAGING_SSH_USER@$STAGING_SSH_HOST:/var/www/lib-monitoring/releases/
     - ssh $STAGING_SSH_USER@$STAGING_SSH_HOST "cd /var/www/lib-monitoring/releases && mkdir $CI_PIPELINE_ID && tar -xf lib-monitoring.tar.bz2 -C $CI_PIPELINE_ID"
     - ssh $STAGING_SSH_USER@$STAGING_SSH_HOST "cd /var/www/lib-monitoring && ln -sfn releases/$CI_PIPELINE_ID current"
   only:
