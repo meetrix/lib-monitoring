@@ -45,10 +45,10 @@ export default class API {
     }
   }
 
-  async other(other: TimelineEvent) {
+  async otherStats(otherInfo: TimelineEvent) {
     try {
       if (this.socket) {
-        this.socket?.emit('other', other)
+        this.socket?.emit('otherInfo', otherInfo)
       }
     } catch (error) {
       console.error('Meetrix:callQualityMonitor:', error)

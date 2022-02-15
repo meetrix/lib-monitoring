@@ -68,7 +68,7 @@ export default class Monitor {
         } else {
           console.log('---- other ----', event)
           if (this.api) {
-            this.api.other(event)
+            this.api.otherStats(event)
           }
         }
       })
