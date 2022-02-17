@@ -13,6 +13,17 @@ export interface ApiOptions {
   options?: SocketOptions & ManagerOptions
 }
 
+export const getMediaInfo = async () => {
+  const browserInfo = { userAgent: navigator.userAgent, platform: navigator.platform }
+  const mediaDeviceInfo = await navigator.mediaDevices.enumerateDevices()
+  return {
+    event: 'mediaInfo',
+    tag: 'getUserMedia',
+    timestamp: new Date().getTime(),
+    data: { browserInfo, mediaDeviceInfo }
+  }
+}
+
 export default class API {
   socket?: Socket
 
@@ -27,6 +38,21 @@ export default class API {
       },
       ...options
     })
+
+    //send mediainfo on connection establishment and periodically
+    const sendMediaInfo = async () => {
+      try {
+        if (this.socket) {
+          const mediaInfo = await getMediaInfo()
+          this.socket?.emit(mediaInfo.event, mediaInfo)
+        }
+      } catch (error) {
+        debug('Meetrix:callQualityMonitor:', error)
+      }
+    }
+
+    this.socket.on('connect', sendMediaInfo)
+    this.socket.io.on('ping', sendMediaInfo)
   }
 
   async report(report: Report) {

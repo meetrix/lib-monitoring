@@ -1,6 +1,5 @@
 import { StatsObject, TimelineEvent } from '@peermetrics/webrtc-stats'
-import { Report } from '@meetrix/webrtc-monitoring-common-lib'
-import { StatsObjectCustom } from '../types'
+import { Report, StatsObjectCustom } from '@meetrix/webrtc-monitoring-common-lib'
 import { addPeerConnected } from '../ui/store/actions'
 
 export const getReportsOfDirection = (
@@ -10,14 +9,10 @@ export const getReportsOfDirection = (
   return [...statsObject.audio[direction], ...statsObject.video[direction]]
 }
 export const getPeerReportData = async (statsObject: StatsObject): Promise<StatsObjectCustom> => {
-  const browserInfo = { userAgent: navigator.userAgent, platform: navigator.platform }
-  const mediaDeviceInfo = await navigator.mediaDevices.enumerateDevices()
   return {
     connection: statsObject.connection,
     inbound: getReportsOfDirection(statsObject, 'inbound'),
-    outbound: getReportsOfDirection(statsObject, 'outbound'),
-    browserInfo,
-    mediaDeviceInfo
+    outbound: getReportsOfDirection(statsObject, 'outbound')
   }
 }
 
