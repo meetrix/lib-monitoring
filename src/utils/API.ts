@@ -19,7 +19,7 @@ export const getMediaInfo = async () => {
   return {
     event: 'mediaInfo',
     tag: 'getUserMedia',
-    timestamp: new Date().getTime(),
+    timestamp: new Date(),
     data: { browserInfo, mediaDeviceInfo }
   }
 }
