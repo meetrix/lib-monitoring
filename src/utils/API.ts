@@ -2,6 +2,10 @@ import io, { Socket, SocketOptions, ManagerOptions } from 'socket.io-client'
 import { BACKEND_URL, SOCKET_PATH } from '../config'
 import { Report } from '@meetrix/webrtc-monitoring-common-lib'
 import { TimelineEvent } from '@peermetrics/webrtc-stats'
+import debugLib from 'debug'
+
+const debug = debugLib('localStorageUtils:')
+debug.enabled = true
 
 export interface ApiOptions {
   token: string
@@ -31,7 +35,7 @@ export default class API {
         this.socket?.emit(report.event, report)
       }
     } catch (error) {
-      console.error('Meetrix:callQualityMonitor:', error)
+      debug('Meetrix:callQualityMonitor:', error)
     }
   }
 
@@ -41,7 +45,7 @@ export default class API {
         this.socket?.emit('connectionInfo', connectionInfo)
       }
     } catch (error) {
-      console.error('Meetrix:callQualityMonitor:', error)
+      debug('Meetrix:callQualityMonitor:', error)
     }
   }
 
@@ -51,7 +55,7 @@ export default class API {
         this.socket?.emit('otherInfo', otherInfo)
       }
     } catch (error) {
-      console.error('Meetrix:callQualityMonitor:', error)
+      debug('Meetrix:callQualityMonitor:', error)
     }
   }
 }
