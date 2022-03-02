@@ -2,7 +2,7 @@ type Envoronments = 'development' | 'staging' | 'production'
 const environment = process.env.NODE_ENV as Envoronments
 const BACKEND_URLS = {
   development: 'http://localhost:9100/clients',
-  staging: 'https://stats.dev.meetrix.io/clients',
+  staging: 'https://apiwr.dev.meetrix.io/clients',
   production: 'https://stats.meetrix.io/clients'
 }
 

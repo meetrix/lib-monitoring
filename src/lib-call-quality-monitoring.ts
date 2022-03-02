@@ -9,6 +9,11 @@ import API from './utils/API'
 import { getReportFromTimelineEvent, handleReport } from './utils/localReport'
 import { getClientId, setClientId } from './utils/localStorageUtils'
 import { getUrlParams } from './utils/urlUtils'
+import debugLib from 'debug'
+
+const debug = debugLib('localStorageUtils:')
+debug.enabled = true
+
 export default class Monitor {
   stats: WebRTCStats
   api: API | undefined
@@ -40,26 +45,36 @@ export default class Monitor {
       logLevel: 'error'
     })
     const events: EventTypes[] = [
-      // 'timeline',
-      'stats'
-      // 'getUserMedia',
-      // 'peer',
-      // 'track',
-      // 'connection',
-      // 'datachannel'
+      'timeline'
+      //'stats',
+      //'getUserMedia',
+      //'peer',
+      //'track',
+      //'connection',
+      //'datachannel'
     ]
 
     getClientId()
 
     events.forEach(eventType => {
-      this.stats.on(eventType, (event: TimelineEvent) => {
-        const report = getReportFromTimelineEvent(event)
-        // console.log('---- report ----', report);
-        if (this.api) {
-          this.api.report(report)
-        }
-        if (eventType === 'stats') {
+      this.stats.on(eventType, async (event: TimelineEvent) => {
+        if (event.event === 'stats') {
+          const report = await getReportFromTimelineEvent(event)
+          debug('---- stats ----', report)
+          if (this.api) {
+            this.api.report(report)
+          }
           handleReport(report)
+        } else if (event.event === 'onconnectionstatechange') {
+          debug('---- onconnectionstatechange ----', event)
+          if (this.api) {
+            this.api.connectionStats(event)
+          }
+        } else {
+          debug('---- other ----', event)
+          if (this.api) {
+            this.api.otherStats(event)
+          }
         }
       })
     })

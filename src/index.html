@@ -1,7 +1,9 @@
 <html>
+
     <head>
 
     </head>
+
     <body>
 
       <div id="localVideo"></div>
@@ -13,7 +15,7 @@
 
       <script src="browser.js"></script>
       <script>
-          window.rtcMonitor = new Monitor({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbHVnaW4iOnRydWUsImRvbWFpbiI6Im1lZXRyaXguaW8iLCJpYXQiOjE2NDA0OTQwMTAsImV4cCI6MTcyNjg5NDAxMCwic3ViIjoiNjFjNmYyNjZjNzU5MjAzMGRiYzViN2EwIn0.lF8zZMj--pOLslgpbP0LjC4FVotEOPQW-rN_2kucJCM'});
+        window.rtcMonitor = new Monitor({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbHVnaW4iOnRydWUsImRvbWFpbiI6Im1lZXRyaXguaW8iLCJpYXQiOjE2NDA0OTQwMTAsImV4cCI6MTcyNjg5NDAxMCwic3ViIjoiNjFjNmYyNjZjNzU5MjAzMGRiYzViN2EwIn0.lF8zZMj--pOLslgpbP0LjC4FVotEOPQW-rN_2kucJCM' });
           // window.rtcMonitor.UI();
       </script>
 
@@ -43,11 +45,11 @@
           const localVideo = document.getElementById('localVideo');
           const remoteVideo = document.getElementById('remoteVideo');
 
-          localVideo.addEventListener('loadedmetadata', function() {
+          localVideo.addEventListener('loadedmetadata', function () {
             // console.log(`Local video videoWidth: ${this.videoWidth}px,  videoHeight: ${this.videoHeight}px`);
           });
 
-          remoteVideo.addEventListener('loadedmetadata', function() {
+          remoteVideo.addEventListener('loadedmetadata', function () {
             // console.log(`Remote video videoWidth: ${this.videoWidth}px,  videoHeight: ${this.videoHeight}px`);
           });
 
@@ -128,6 +130,8 @@
             pc1.addEventListener('iceconnectionstatechange', e => onIceStateChange(pc1, e));
             pc2.addEventListener('iceconnectionstatechange', e => onIceStateChange(pc2, e));
             pc2.addEventListener('track', gotRemoteStream);
+            pc2.addEventListener('connectionstatechange', e => onconnectionstatechange(pc2, e));
+            pc1.addEventListener('connectionstatechange', e => onconnectionstatechange(pc1, e));
 
             localStream.getTracks().forEach(track => pc1.addTrack(track, localStream));
             remoteStream.getTracks().forEach(track => pc2.addTrack(track, remoteStream));
@@ -195,8 +199,8 @@
           }
 
           async function onCreateAnswerSuccess(desc) {
-            // console.log(`Answer from pc2:\n${desc.sdp}`);
-            // console.log('pc2 setLocalDescription start');
+          //console.log(`Answer from pc2:\n${desc.sdp}`);
+          //console.log('pc2 setLocalDescription start');
             try {
               await pc2.setLocalDescription(desc);
               onSetLocalSuccess(pc2);
@@ -237,6 +241,14 @@
             }
           }
 
+          function onconnectionstatechange(pc, event) {
+            if (pc) {
+              //console.log(`${getName(pc)} connection state: ${pc.connectionState}`);
+              //console.log('connection state change event: ', event);
+            }
+          }
+
+
           function hangup() {
             // console.log('Ending call');
             let local = pc1.getSenders()
@@ -260,4 +272,5 @@
           }
       </script>
     </body>
+
 </html>

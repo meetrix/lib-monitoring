@@ -87,6 +87,11 @@ export interface ConnectionReport {
   writable: true
 }
 
+export interface BrowserInfo {
+  userAgent: string
+  platform: string
+}
+
 export interface StatsObjectCustom {
   inbound: TrackReportExtended[]
   outbound: TrackReportExtended[]

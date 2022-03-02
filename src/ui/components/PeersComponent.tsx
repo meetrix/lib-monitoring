@@ -1,6 +1,4 @@
 /** @jsx jsx */
-import preact from 'preact/compat';
-import { jsx } from '@emotion/react';
 import { Peer } from '../../types';
 import { PeerComponent, PeerComponentProps } from './PeerComponent';
 
