@@ -14,6 +14,12 @@ The tests run on `node` environment instead of the real browser environment. Bec
 3. Make sure you have started the `webrtc-monitoring-backend`
 4. Visit [http://localhost:8080/?clientId=1234] to set the clientId and start a call
 
+## Testing UI
+
+UI can be tested by passing url params
+
+eg: [http://localhost:8080/?mockStats=true]
+
 ## Building production bundle
 
 Run `npm run build`

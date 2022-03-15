@@ -1,5 +1,5 @@
 import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
+import commonjs from '@rollup/plugin-commonjs'
 import sourceMaps from 'rollup-plugin-sourcemaps'
 import camelCase from 'lodash.camelcase'
 import typescript from 'rollup-plugin-typescript2'
@@ -45,14 +45,6 @@ const plugins = [
   // replace ENV config in react : https://github.com/rollup/rollup/issues/487#issuecomment-177596512
   replace({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-  }),
-  alias({
-    entries: [
-      { find: 'react', replacement: 'preact/compat' },
-      { find: 'react-dom/test-utils', replacement: 'preact/test-utils' },
-      { find: 'react-dom', replacement: 'preact/compat' },
-      { find: 'react/jsx-runtime', replacement: 'preact/jsx-runtime' }
-    ]
   })
 ]
 

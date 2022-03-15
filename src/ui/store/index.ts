@@ -1,5 +1,5 @@
 import createStore from 'unistore'
-import { Provider, connect } from 'unistore/preact'
+import { Provider, connect } from 'unistore/react'
 
 export interface Peer {
   peerId: string

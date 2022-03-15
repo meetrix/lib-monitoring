@@ -1,3 +1,6 @@
+import { css } from '@emotion/css';
+import { Chip } from '@mui/material';
+
 export interface CandidateProps {
   type: 'local' | 'remote';
   candidateType: 'host' | 'srflx' | 'prflx' | 'relay';
@@ -8,11 +11,16 @@ export interface CandidateProps {
 
 export const Candidate = ({type, ip, port, protocol, candidateType}: CandidateProps) => {
   return (<div
-    css={{
+    // className={css({
+    //   display: 'flex',
+    //   justifyContent: 'space-between'
+    // })}
+  >
+    <Chip label={`${type.split('-')[0]}: ${ip}:${port} ${protocol} ${candidateType}`}/>
+    {/* css={{
       display: 'flex',
       justifyContent: 'space-between'
-    }}
-  >
+    }} */}
     <p>{`${type}: `}</p>
     <p>{`${ip}:${port} ${protocol} ${candidateType}`}</p>
   </div>)

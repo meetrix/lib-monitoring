@@ -1,7 +1,6 @@
-/** @jsx jsx */
-import preact from 'preact/compat';
-import { jsx } from '@emotion/react';
+import React from 'react';
 import { PeerComponent } from './PeerComponent';
+import { css } from '@emotion/css';
 
 export interface DisplayStatsProps {
   count: number,
@@ -12,9 +11,9 @@ const DisplayStats = ({ count, increment }: DisplayStatsProps) => {
   return (
     <div>
       <button
-        css={{
+        className={css({
           color: 'hotpink'
-        }}
+        })}
         onClick={increment}
       >
         {`Hello ${count}`}

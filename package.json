@@ -34,8 +34,10 @@
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "lint-staged",
     "travis-deploy-once": "travis-deploy-once",
-    "copy": "cpy ./src/index.html ./dist",
-    "generate-doc": "typedoc --out docs --theme minimal src"
+    "copy": "cpy './src/index.html' './dist'",
+    "generate-doc": "typedoc --out docs --theme minimal src",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
@@ -88,17 +90,28 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.16.0",
     "@babel/preset-react": "^7.16.0",
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
     "@rollup/plugin-alias": "^3.1.8",
     "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-eslint": "^8.0.1",
+    "@storybook/addon-actions": "^6.4.19",
+    "@storybook/addon-essentials": "^6.4.19",
+    "@storybook/addon-interactions": "^6.4.19",
+    "@storybook/addon-links": "^6.4.19",
+    "@storybook/react": "^6.4.19",
+    "@storybook/testing-library": "0.0.9",
     "@types/debug": "^4.1.5",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.0",
+    "@types/qs": "^6.9.7",
+    "babel-loader": "^8.2.3",
     "colors": "^1.3.2",
     "commitizen": "^3.0.0",
+    "core-js": "^3.19.3",
     "coveralls": "^3.0.2",
     "cpy-cli": "^3.1.1",
     "cross-env": "^5.2.0",
@@ -113,7 +126,7 @@
     "prompt": "^1.0.0",
     "replace-in-file": "^3.4.2",
     "rimraf": "^2.6.2",
-    "rollup": "^1.32.1",
+    "rollup": "^2.61.1",
     "rollup-plugin-commonjs": "^9.1.8",
     "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.5",
@@ -137,14 +150,19 @@
     "wrtc": "^0.4.6"
   },
   "dependencies": {
-    "@emotion/react": "^11.6.0",
+    "@emotion/css": "^11.5.0",
+    "@emotion/react": "^11.7.1",
+    "@mui/icons-material": "^5.2.5",
+    "@mui/material": "^5.2.5",
     "@meetrix/webrtc-monitoring-common-lib": "git+https://gitlab.com/meetrix/products/webrtc-monitoring/webrtc-monitoring-common-lib.git#feat/dashboard-log-devices-browserinfo",
     "@peermetrics/webrtc-stats": "github:buddhikajay/webrtc-stats",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "axios": "^0.21.1",
     "nanoid": "^3.1.30",
-    "preact": "^10.6.0",
+    "qs": "^6.10.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "socket.io-client": "^4.4.0",
     "unistore": "^3.5.2"
   }

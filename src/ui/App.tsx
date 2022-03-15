@@ -1,20 +1,16 @@
-/** @jsx jsx */
-import preact from 'preact/compat';
-import { jsx } from '@emotion/react'
-
-import { Provider } from 'unistore/preact';
+import React from 'react';
+import { Provider } from 'unistore/react';
 import store from './store';
 import DisplayStats from './containers/DisplayCodecs.container';
 import Peers from './containers/Peers.container';
+import { URLParametersProvider } from './providers/urlParameters';
+import { ThemeProvider } from '@mui/material/styles';
 
 export default () => {
   return(
-  // @ts-ignore
   <Provider store={store}>
-    {/* @ts-ignore */}
-    {/* <DisplayStats/> */}
-    {/* @ts-ignore */}
-    <Peers/>
+        {/* @ts-ignore */}
+        <Peers/>
   </Provider>
   )
 }
