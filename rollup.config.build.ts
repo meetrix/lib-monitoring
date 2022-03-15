@@ -46,14 +46,6 @@ const plugins = [
   replace({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
   }),
-  alias({
-    entries: [
-      { find: 'react', replacement: 'preact/compat' },
-      { find: 'react-dom/test-utils', replacement: 'preact/test-utils' },
-      { find: 'react-dom', replacement: 'preact/compat' },
-      { find: 'react/jsx-runtime', replacement: 'preact/jsx-runtime' }
-    ]
-  })
 ]
 
 export default [

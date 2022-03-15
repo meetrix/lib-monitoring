@@ -1,4 +1,4 @@
-import { connect } from 'unistore/preact'
+import { connect } from 'unistore/react'
 import { Store, Peer, store } from './index'
 
 export type ActionType = (s: Store, ...otherProps: any[]) => any

@@ -1,7 +1,5 @@
-/** @jsx jsx */
-import preact from 'preact/compat';
-import { jsx } from '@emotion/react';
-import { Provider, connect } from 'unistore/preact';
+import React from 'react';
+import { Provider, connect } from 'unistore/react';
 import DisplayStats, { DisplayStatsProps } from '../components/DisplayStats';
 import { increment } from '../store/actions';
 
