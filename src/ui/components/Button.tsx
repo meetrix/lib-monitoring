@@ -1,5 +1,6 @@
 import React from 'react';
 import { css } from '@emotion/css';
+import Button from '@mui/material/Button';
 
 /**
  * Primary UI component for user interaction
@@ -24,7 +25,7 @@ export interface ButtonComponentProps {
    */
   onClick?: () => {}
 }
-export const Button = ({ color = 'primary', backgroundColor, size = 'medium', label, ...props }: ButtonComponentProps) => {
+export const ButtonComponent = ({ color = 'primary', backgroundColor, size = 'medium', label, ...props }: ButtonComponentProps) => {
   const baseStyles = {
     fontFamily: "'Nunito Sans', 'Helvetica Neue',Helvetica, Arial, sans-serif",
     fontWeight: 700,
@@ -61,8 +62,7 @@ export const Button = ({ color = 'primary', backgroundColor, size = 'medium', la
     }
   }
   return (
-    <button
-      type="button"
+    <Button
       className={css({
         ...baseStyles,
         ...colors[color],
@@ -72,6 +72,8 @@ export const Button = ({ color = 'primary', backgroundColor, size = 'medium', la
       // {...props}
     >
       {label}
-    </button>
+    </Button>
   );
 };
+
+export default ButtonComponent;
