@@ -1,17 +1,20 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import  CheckListRow  from '../ui/components/CheckListRow';
+import  TestListRow  from '../ui/components/TestListRow';
 
 export default {
-  title: 'Example/CheckListRow',
-  component: CheckListRow,
+  title: 'Example/TestListRow',
+  component: TestListRow,
   argTypes: {
-    backgroundColor: { control: 'color' },
+    label: {
+      defaultValue: 'sample label',
+      control: { type: 'text' }
+    },
   },
-} as ComponentMeta<typeof CheckListRow>;
+} as ComponentMeta<typeof TestListRow>;
 
-const Template: ComponentStory<typeof CheckListRow> = (args) => <CheckListRow {...args} />;
+const Template: ComponentStory<typeof TestListRow> = (args) => <TestListRow {...args} />;
 
 export const Success = Template.bind({});
 Success.args = {

@@ -37,20 +37,20 @@ const styles = (theme: Theme) => {
   });
 };
 
-export interface CheckListRowProps
+export interface TestListRowProps
   extends WithStyles<ButtonProps & typeof styles> {
   label?: string;
   type?: 'success' | 'fail' | 'unset' | 'running' | 'result';
   message?: string;
 }
 
-export const CheckListRow: React.FC<CheckListRowProps> = ({
+export const TestListRow: React.FC<TestListRowProps> = ({
   classes,
   label = 'Label',
   type = 'success',
   message = "sample message",
   ...otherProps
-}: CheckListRowProps) => {
+}: TestListRowProps) => {
   const rootStyles = {
     display: 'flex',
     justifyContent: 'space-between',
@@ -104,4 +104,4 @@ export const CheckListRow: React.FC<CheckListRowProps> = ({
   );
 };
 
-export default withStyles(styles)(CheckListRow);
+export default withStyles(styles)(TestListRow);
