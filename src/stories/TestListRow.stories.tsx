@@ -8,7 +8,7 @@ export default {
   component: TestListRow,
   argTypes: {
     label: {
-      defaultValue: 'sample label',
+      defaultValue: 'Checking your microphone',
       control: { type: 'text' }
     },
   },
@@ -19,11 +19,13 @@ const Template: ComponentStory<typeof TestListRow> = (args) => <TestListRow {...
 export const Success = Template.bind({});
 Success.args = {
   type: 'success',
+  message: 'No issues found',
 };
 
 export const Fail = Template.bind({});
 Fail.args = {
   type: 'fail',
+  message: 'There is a problem with your microphone',
 };
 
 export const Running = Template.bind({});

@@ -21,7 +21,7 @@ const styles = (theme: Theme) => {
       width: 20,
     },
     label: {
-      color: '#00000061',
+      color: '#000',
     },
     rotatingEffect: {
       animation: `$icon-rotation 1s linear infinite`,
@@ -46,9 +46,9 @@ export interface TestListRowProps
 
 export const TestListRow: React.FC<TestListRowProps> = ({
   classes,
-  label = 'Label',
-  type = 'success',
-  message = "sample message",
+  label,
+  type = 'unset',
+  message,
   ...otherProps
 }: TestListRowProps) => {
   const rootStyles = {
@@ -59,21 +59,19 @@ export const TestListRow: React.FC<TestListRowProps> = ({
   const colors = {
     success: {
       color: '#7CC479',
+      '& .label-styles': {
+        color: '#00000061',
+      }
     },
     fail: {
       color: '#F05353',
+      '& .label-styles': {
+        color: '#00000061',
+      }
     },
     running: {},
-    unset: {
-      '& .label-styles': {
-        color: '#000',
-      }
-    },
-    result: {
-      '& .label-styles': {
-        color: '#000',
-      }
-    },
+    unset: {},
+    result: {},
   };
 
 
