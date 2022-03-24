@@ -152,9 +152,10 @@
   "dependencies": {
     "@emotion/css": "^11.5.0",
     "@emotion/react": "^11.7.1",
+    "@meetrix/webrtc-monitoring-common-lib": "git+https://gitlab.com/meetrix/products/webrtc-monitoring/webrtc-monitoring-common-lib.git#feat/dashboard-log-devices-browserinfo",
     "@mui/icons-material": "^5.2.5",
     "@mui/material": "^5.2.5",
-    "@meetrix/webrtc-monitoring-common-lib": "git+https://gitlab.com/meetrix/products/webrtc-monitoring/webrtc-monitoring-common-lib.git#feat/dashboard-log-devices-browserinfo",
+    "@mui/styles": "^5.5.1",
     "@peermetrics/webrtc-stats": "github:buddhikajay/webrtc-stats",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
