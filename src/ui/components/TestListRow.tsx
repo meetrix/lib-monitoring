@@ -25,6 +25,7 @@ const styles = (theme: Theme) => {
     },
     rotatingEffect: {
       animation: `$icon-rotation 1s linear infinite`,
+      color: '#00000061',
     },
     "@keyframes icon-rotation": {
       '0%': {
