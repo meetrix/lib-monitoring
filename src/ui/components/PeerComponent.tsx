@@ -14,7 +14,7 @@ export type PeerComponentProps = {
 export const PeerComponent = ({
   peer: { peerId, inbound, outbound, connection }
 }: PeerComponentProps) => {
-  const getKiliBytesFromBytes = (bytes: number) => bytes >> 10
+  const getKiloBytesFromBytes = (bytes: number) => bytes >> 10
 
   return (
     <div
@@ -29,10 +29,10 @@ export const PeerComponent = ({
       <p>{`peerId: ${peerId}`}</p>
       <Grid container spacing={2}>
         <Grid item xs={4}>
-          <Chip icon={<ArrowUpward/>} label={`${getKiliBytesFromBytes(connection.bytesSent)} KB`}/>
+          <Chip icon={<ArrowUpward/>} label={`${getKiloBytesFromBytes(connection.bytesSent)} KB`}/>
         </Grid>
         <Grid item xs={4}>
-          <Chip icon={<ArrowDownward/>} label={`${getKiliBytesFromBytes(connection.bytesReceived)} KB`}/>
+          <Chip icon={<ArrowDownward/>} label={`${getKiloBytesFromBytes(connection.bytesReceived)} KB`}/>
         </Grid>
       </Grid>
 
