@@ -1,12 +1,13 @@
 import { ComponentType } from 'react';
 import { css } from '@emotion/css';
-import { WithTheme, withTheme } from '../providers/themeProvider';
+import { withTheme, WithTheme } from '@emotion/react';
+import { Theme } from '@mui/material';
 
 export interface CardComponentProps {
 
 }
 
-const _Card = (props: WithTheme<CardComponentProps>) => {
+const _Card = (props: WithTheme<CardComponentProps, Theme>) => {
   const styles = {
     background: props.theme.palette.background.default
   };
