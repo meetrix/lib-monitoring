@@ -1,6 +1,7 @@
 import React from 'react';
-import { Modal, Button, ButtonProps, Theme, Typography, Box, Divider } from '@mui/material';
+import { Modal, Button, ButtonProps, Theme, Typography, Box, Divider, IconButton } from '@mui/material';
 import { withStyles, createStyles, WithStyles } from '@mui/styles';
+import CloseIcon from '@mui/icons-material/Close';
 import clsx from 'clsx';
 import TestListRow from './TestListRow';
 
@@ -8,6 +9,11 @@ const styles = (theme: Theme) => {
   return createStyles({
     root: {
       width: 'clamp(500px ,40vw, 700px)',
+    },
+    closeButton: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
     },
     contentWrapper: {
       backgroundColor: '#fff',
@@ -29,7 +35,7 @@ export interface TestModalProps
   extends WithStyles<ButtonProps & typeof styles> {
   label?: string;
   open: boolean;
-  handleClose?: any;
+  handleClose?: () => {};
 }
 
 export const TestModal: React.FC<TestModalProps> = ({
@@ -39,6 +45,29 @@ export const TestModal: React.FC<TestModalProps> = ({
   handleClose,
   ...otherProps
 }: TestModalProps) => {
+
+  const ModalListData = [
+    {
+      label: 'Checking your browser',
+      type: 'error',
+      message: 'Your browser is not compatible',
+    },
+    {
+      label: 'Checking your microphone',
+      type: 'success',
+      message: 'No issues found',
+    },
+    {
+      label: 'Checking your camera',
+      type: 'running',
+      message: undefined,
+    },
+    {
+      label: 'Checking your network connection',
+      type: 'unset',
+      message: undefined,
+    }
+  ]
 
   return (
     <Modal
@@ -50,6 +79,9 @@ export const TestModal: React.FC<TestModalProps> = ({
         aria-describedby="test-modal-description"
       >
         <Box className={classes.contentWrapper}>
+          <IconButton aria-label="close" className={classes.closeButton}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
           <Typography id="test-modal-title" variant="h6" component="h2">
             Let’s test your devices and network connection
           </Typography>
@@ -57,6 +89,9 @@ export const TestModal: React.FC<TestModalProps> = ({
           Please do not close this window until the test completes
           </Typography>
           <div className={classes.listWrapper}>
+            {/* {ModalListData.map((data) => {
+              return <TestListRow label={data?.label} type={data.type} message={data?.message} />
+            })} */}
             <TestListRow label="Checking your browser" type="error" message="Your browser is not compatible" />
             <TestListRow label="Checking your microphone" type="success" message="No issues found" />
             <TestListRow label="Checking your camera" type="running" />
