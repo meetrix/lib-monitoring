@@ -24,7 +24,7 @@ Success.args = {
 
 export const Fail = Template.bind({});
 Fail.args = {
-  type: 'fail',
+  type: 'error',
   message: 'There is a problem with your microphone',
 };
 
@@ -35,7 +35,7 @@ Running.args = {
 
 export const Result = Template.bind({});
 Result.args = {
-  type: 'result',
+  type: 'blackIcon',
 };
 
 export const Unset = Template.bind({});
