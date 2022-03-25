@@ -21,11 +21,11 @@ const styles = (theme: Theme) => {
       width: 20,
     },
     label: {
-      color: '#000',
+      color: '#00000061',
     },
     rotatingEffect: {
       animation: `$icon-rotation 1s linear infinite`,
-      color: '#00000061',
+      color: '#00000040',
     },
     "@keyframes icon-rotation": {
       '0%': {
@@ -41,7 +41,7 @@ const styles = (theme: Theme) => {
 export interface TestListRowProps
   extends WithStyles<ButtonProps & typeof styles> {
   label?: string;
-  type?: 'success' | 'fail' | 'unset' | 'running' | 'result';
+  type?: 'success' | 'error' | 'unset' | 'running' | 'blackIcon';
   message?: string;
 }
 
@@ -56,23 +56,26 @@ export const TestListRow: React.FC<TestListRowProps> = ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    margin: '3vh 0',
   };
   const colors = {
     success: {
       color: '#7CC479',
-      '& .label-styles': {
-        color: '#00000061',
-      }
     },
-    fail: {
+    error: {
       color: '#F05353',
+    },
+    running: {
       '& .label-styles': {
-        color: '#00000061',
+        color: '#000',
       }
     },
-    running: {},
     unset: {},
-    result: {},
+    blackIcon: {
+      '& .label-styles': {
+        color: '#000',
+      }
+    },
   };
 
 
@@ -80,14 +83,12 @@ export const TestListRow: React.FC<TestListRowProps> = ({
     switch(type) {
       case 'success':
         return <CheckCircleIcon fontSize="small"/>
-      case 'fail':
+      case 'error':
         return <ErrorIcon fontSize="small" />
       case 'running':
         return <DataSaverOffIcon fontSize="small" className={classes.rotatingEffect} />
-      case 'result':
+      case 'blackIcon':
         return <ErrorIcon fontSize="small" />
-      case 'unset':
-          return null
       default:
         return null;
     }
