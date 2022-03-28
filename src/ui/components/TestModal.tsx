@@ -11,7 +11,7 @@ const styles = (theme: Theme) => {
       width: 'clamp(550px ,40vw, 700px)',
     },
     closeButton: {
-      position: 'absolute',
+      position: 'absolute !important' as 'absolute',
       top: 0,
       right: 0,
     },
@@ -31,6 +31,29 @@ const styles = (theme: Theme) => {
   });
 };
 
+const ModalListData = [
+  {
+    label: 'Checking your browser',
+    type: 'error',
+    message: 'Your browser is not compatible',
+  },
+  {
+    label: 'Checking your microphone',
+    type: 'success',
+    message: 'No issues found',
+  },
+  {
+    label: 'Checking your camera',
+    type: 'running',
+    message: undefined,
+  },
+  {
+    label: 'Checking your network connection',
+    type: 'unset',
+    message: undefined,
+  }
+]
+
 export interface TestModalProps
   extends WithStyles<ButtonProps & typeof styles> {
   label?: string;
@@ -45,30 +68,6 @@ export const TestModal: React.FC<TestModalProps> = ({
   handleClose,
   ...otherProps
 }: TestModalProps) => {
-
-  const ModalListData = [
-    {
-      label: 'Checking your browser',
-      type: 'error',
-      message: 'Your browser is not compatible',
-    },
-    {
-      label: 'Checking your microphone',
-      type: 'success',
-      message: 'No issues found',
-    },
-    {
-      label: 'Checking your camera',
-      type: 'running',
-      message: undefined,
-    },
-    {
-      label: 'Checking your network connection',
-      type: 'unset',
-      message: undefined,
-    }
-  ]
-
   return (
     <Modal
         open={open}
