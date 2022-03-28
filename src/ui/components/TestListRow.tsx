@@ -9,10 +9,35 @@ import clsx from 'clsx';
 
 const styles = (theme: Theme) => {
   return createStyles({
-    applyFlex: {
+    root: {
+      margin: '3vh 0',
+      '& .success': {
+        color: '#7CC479',
+      },
+      '& .error': {
+        color: '#F05353',
+      },
+      '& .running': {
+        '& .label-styles': {
+          color: '#000',
+        }
+      },
+      '& .blackIcon': {
+        '& .label-styles': {
+          color: '#000',
+        }
+      },
+      
+    },
+    rowInnerWrapper: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
+    },
+    applyFlex: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
     },
     icon: {
       display: 'flex',
@@ -41,7 +66,7 @@ const styles = (theme: Theme) => {
 export interface TestListRowProps
   extends WithStyles<ButtonProps & typeof styles> {
   label?: string;
-  type?: 'success' | 'error' | 'unset' | 'running' | 'blackIcon';
+  type?: 'success' | 'error' | 'unset' | 'running' | 'blackIcon' | string;
   message?: string;
 }
 
@@ -50,35 +75,7 @@ export const TestListRow: React.FC<TestListRowProps> = ({
   label,
   type = 'unset',
   message,
-  ...otherProps
 }: TestListRowProps) => {
-  const rootStyles = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    margin: '3vh 0',
-  };
-  const colors = {
-    success: {
-      color: '#7CC479',
-    },
-    error: {
-      color: '#F05353',
-    },
-    running: {
-      '& .label-styles': {
-        color: '#000',
-      }
-    },
-    unset: {},
-    blackIcon: {
-      '& .label-styles': {
-        color: '#000',
-      }
-    },
-  };
-
-
   const renderIcon = () => {
     switch(type) {
       case 'success':
@@ -94,12 +91,14 @@ export const TestListRow: React.FC<TestListRowProps> = ({
     }
   }
   return (
-    <div className={css({ ...colors[type], ...rootStyles})}>
-      <div className={classes.applyFlex}>
+    <div className={classes.root}>
+      <div className={clsx(classes.applyFlex, `${type}`)}>
+        <div className={classes.applyFlex}>
         <div className={classes.icon}>{renderIcon()}</div>
         <Typography variant="body2" className={clsx(classes.label, 'label-styles')}>{label}</Typography>
       </div>
       {message && <Typography variant="body2">{message}</Typography>}
+      </div>
     </div>
   );
 };

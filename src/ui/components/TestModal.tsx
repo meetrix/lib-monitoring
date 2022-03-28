@@ -8,7 +8,7 @@ import TestListRow from './TestListRow';
 const styles = (theme: Theme) => {
   return createStyles({
     root: {
-      width: 'clamp(500px ,40vw, 700px)',
+      width: 'clamp(550px ,40vw, 700px)',
     },
     closeButton: {
       position: 'absolute',
@@ -89,13 +89,9 @@ export const TestModal: React.FC<TestModalProps> = ({
           Please do not close this window until the test completes
           </Typography>
           <div className={classes.listWrapper}>
-            {/* {ModalListData.map((data) => {
+            {ModalListData.map((data) => {
               return <TestListRow label={data?.label} type={data.type} message={data?.message} />
-            })} */}
-            <TestListRow label="Checking your browser" type="error" message="Your browser is not compatible" />
-            <TestListRow label="Checking your microphone" type="success" message="No issues found" />
-            <TestListRow label="Checking your camera" type="running" />
-            <TestListRow label="Checking your network connection" />
+            })}
           </div>
           <Divider />
           <TestListRow label="Unfortunately you can’t make video calls through this browser, and your devices is not compatible." type="blackIcon" />
