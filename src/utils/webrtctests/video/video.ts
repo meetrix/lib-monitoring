@@ -27,7 +27,6 @@
  */
 
 import Debug from 'debug';
-import { Dispatch } from '@reduxjs/toolkit';
 import {
   arrayAverage,
   arrayMax,
@@ -36,33 +35,37 @@ import {
   setTimeoutWithProgressBar
 } from '../../testUtil';
 import Call from '../../call';
-import { actions as videoActions } from '../../../ui/slice/video/video.slice';
 import VideoFrameChecker from './videoframechecker';
+import { TestEvent, TestEventCallback } from '../TestEvent';
 
 const debug = Debug('videoTest');
 
 let resolutions: number[][];
+let resolutionSuccessStatus: boolean[];
 let currentResolution = 0;
 let isMuted = false;
 let isShuttingDown = false;
 let aStream: MediaStream;
 let type: string;
 
-let dispatch: Dispatch;
+let report: TestEventCallback;
 
 const initVideoTest = async (
-  dispatchArg: Dispatch,
+  callback: TestEventCallback,
   resolutionsArg: number[][],
   typeArg: string
-) => {
+): Promise<boolean> => {
   resolutions = resolutionsArg;
+  resolutionSuccessStatus = new Array(resolutions.length).fill(true);
   type = typeArg;
-  dispatch = dispatchArg;
+  report = callback;
   currentResolution = 0;
   isMuted = false;
   isShuttingDown = false;
-  dispatch(videoActions.startTest(type));
+  callback(TestEvent.START, type);
   await runVideoTest(resolutions[0]);
+
+  return resolutionSuccessStatus.every(Boolean);
 };
 
 const runVideoTest = async (resolution: number[]) => {
@@ -79,9 +82,7 @@ const runVideoTest = async (resolution: number[]) => {
     aStream = await doGetUserMedia(constraints);
 
     if (resolutions.length > 1) {
-      dispatch(
-        videoActions.addSubMessage([type, `[ OK ] Supported: ${resolution[0]}x${resolution[1]}`])
-      );
+      report(TestEvent.MESSAGE, [type, `[ OK ] Supported: ${resolution[0]}x${resolution[1]}`]);
       aStream.getTracks().forEach((track: any) => {
         track.stop();
       });
@@ -90,17 +91,11 @@ const runVideoTest = async (resolution: number[]) => {
       await collectAndAnalyzeStats_(resolution);
     }
   } catch (error) {
+    resolutionSuccessStatus[currentResolution] = false;
     if (resolutions.length > 1) {
-      dispatch(
-        videoActions.addSubMessage([
-          type,
-          `[ INFO ] ${resolution[0]}x${resolution[1]} not supported`
-        ])
-      );
+      report(TestEvent.MESSAGE, [type, `[ INFO ] ${resolution[0]}x${resolution[1]} not supported`]);
     } else {
-      dispatch(
-        videoActions.addSubMessage([type, `[ FAILED ] getUserMedia failed with error: ${error}`])
-      );
+      report(TestEvent.MESSAGE, [type, `[ FAILED ] getUserMedia failed with error: ${error}`]);
     }
     await maybeContinueGetUserMedia();
   }
@@ -108,7 +103,7 @@ const runVideoTest = async (resolution: number[]) => {
 
 const maybeContinueGetUserMedia = async () => {
   if (currentResolution === resolutions.length) {
-    dispatch(videoActions.endTest([type, 'success']));
+    report(TestEvent.END, [type, resolutionSuccessStatus.every(Boolean) ? 'success' : 'failure']);
     return;
   }
   await runVideoTest(resolutions[currentResolution++]);
@@ -118,7 +113,7 @@ const collectAndAnalyzeStats_ = async (resolution: number[]) => {
   debug('collectAndAnalyzeStats_()');
   const tracks = aStream.getVideoTracks();
   if (tracks.length < 1) {
-    dispatch(videoActions.addSubMessage([type, '[ FAILED ] No video track in returned stream.']));
+    report(TestEvent.MESSAGE, [type, '[ FAILED ] No video track in returned stream.']);
     await maybeContinueGetUserMedia();
     return;
   }
@@ -134,18 +129,14 @@ const collectAndAnalyzeStats_ = async (resolution: number[]) => {
       if (isShuttingDown) {
         return;
       }
-      dispatch(
-        videoActions.addSubMessage([type, '[ FAILED ] Video track ended, camera stopped working'])
-      );
+      report(TestEvent.MESSAGE, [type, '[ FAILED ] Video track ended, camera stopped working']);
     });
     videoTrack.addEventListener('mute', () => {
       // Ignore events when shutting down the test.
       if (isShuttingDown) {
         return;
       }
-      dispatch(
-        videoActions.addSubMessage([type, '[ WARN ] Your camera reported itself as muted.'])
-      );
+      report(TestEvent.MESSAGE, [type, '[ WARN ] Your camera reported itself as muted.']);
       // MediaStreamTrack.muted property is not wired up in Chrome yet,
       // checking isMuted local state.
       isMuted = true;
@@ -155,9 +146,7 @@ const collectAndAnalyzeStats_ = async (resolution: number[]) => {
       if (isShuttingDown) {
         return;
       }
-      dispatch(
-        videoActions.addSubMessage([type, '[ INFO ] Your camera reported itself as unmuted.'])
-      );
+      report(TestEvent.MESSAGE, [type, '[ INFO ] Your camera reported itself as unmuted.']);
       isMuted = false;
     });
   }
@@ -198,7 +187,7 @@ const onCallEnded_ = (
 
   frameChecker.stop();
 
-  dispatch(videoActions.endTest([type, 'success']));
+  report(TestEvent.END, [type, 'success']);
 };
 
 const analyzeStats_ = (
@@ -295,24 +284,20 @@ const testExpectations_ = (info: any) => {
       if (typeof info[key] === 'number' && Number.isNaN(info[key])) {
         notAvailableStats.push(key);
       } else {
-        dispatch(videoActions.addSubMessage([type, `[ INFO ] ${key}: ${info[key]}`]));
+        report(TestEvent.MESSAGE, [type, `[ INFO ] ${key}: ${info[key]}`]);
       }
     }
   }
   if (notAvailableStats.length !== 0) {
-    dispatch(
-      videoActions.addSubMessage([type, `[ INFO ] Not available: ${notAvailableStats.join(', ')}`])
-    );
+    report(TestEvent.MESSAGE, [type, `[ INFO ] Not available: ${notAvailableStats.join(', ')}`]);
   }
 
   if (Number.isNaN(info.avgSentFps)) {
-    dispatch(videoActions.addSubMessage([type, '[ INFO ] Cannot verify sent FPS.']));
+    report(TestEvent.MESSAGE, [type, '[ INFO ] Cannot verify sent FPS.']);
   } else if (info.avgSentFps < 5) {
-    dispatch(
-      videoActions.addSubMessage([type, `[ FAILED ] Low average sent FPS: ${info.avgSentFps}`])
-    );
+    report(TestEvent.MESSAGE, [type, `[ FAILED ] Low average sent FPS: ${info.avgSentFps}`]);
   } else {
-    dispatch(videoActions.addSubMessage([type, '[ OK ] Average FPS above threshold']));
+    report(TestEvent.MESSAGE, [type, '[ OK ] Average FPS above threshold']);
   }
   if (
     !resolutionMatchesIndependentOfRotationOrCrop_(
@@ -322,24 +307,18 @@ const testExpectations_ = (info: any) => {
       info.mandatoryHeight
     )
   ) {
-    dispatch(videoActions.addSubMessage([type, '[ FAILED ] Incorrect captured resolution.']));
+    report(TestEvent.MESSAGE, [type, '[ FAILED ] Incorrect captured resolution.']);
   } else {
-    dispatch(
-      videoActions.addSubMessage([type, '[ OK ] Captured video using expected resolution.'])
-    );
+    report(TestEvent.MESSAGE, [type, '[ OK ] Captured video using expected resolution.']);
   }
   if (info.testedFrames === 0) {
-    dispatch(videoActions.addSubMessage([type, '[ FAILED ] Could not analyze any video frame.']));
+    report(TestEvent.MESSAGE, [type, '[ FAILED ] Could not analyze any video frame.']);
   } else {
     if (info.blackFrames > info.testedFrames / 3) {
-      dispatch(
-        videoActions.addSubMessage([type, '[ FAILED ] Camera delivering lots of black frames.'])
-      );
+      report(TestEvent.MESSAGE, [type, '[ FAILED ] Camera delivering lots of black frames.']);
     }
     if (info.frozenFrames > info.testedFrames / 3) {
-      dispatch(
-        videoActions.addSubMessage([type, '[ FAILED ] Camera delivering lots of frozen frames.'])
-      );
+      report(TestEvent.MESSAGE, [type, '[ FAILED ] Camera delivering lots of frozen frames.']);
     }
   }
 };
@@ -350,20 +329,21 @@ const sleep = (time: number): Promise<void> => {
   });
 };
 
-const runVideoTests = async (dispatchArg: Dispatch): Promise<void> => {
+const runVideoTests = async (callback: TestEventCallback): Promise<boolean> => {
   await sleep(1000);
   debug(Date.now());
-  await initVideoTest(dispatchArg, [[320, 240]], 'p240');
+  const p240 = await initVideoTest(callback, [[320, 240]], 'p240');
   await sleep(5000);
   debug(Date.now());
-  await initVideoTest(dispatchArg, [[640, 480]], 'p480');
+  const p480 = await initVideoTest(callback, [[640, 480]], 'p480');
   await sleep(5000);
   debug(Date.now());
-  await initVideoTest(dispatchArg, [[1280, 720]], 'p720');
+  const p720 = await initVideoTest(callback, [[1280, 720]], 'p720');
   await sleep(5000);
   debug(Date.now());
-  await initVideoTest(
-    dispatchArg,
+  // TODO: clarify: why are the above tests run separately, and why are they run again below?
+  const generic = await initVideoTest(
+    callback,
     [
       [160, 120],
       [320, 180],
@@ -384,5 +364,9 @@ const runVideoTests = async (dispatchArg: Dispatch): Promise<void> => {
   );
   await sleep(1000);
   debug(Date.now());
+
+  // TODO: Decide success logic
+  return p240 && p480 && p720; // generic omitted
 };
+
 export default runVideoTests;

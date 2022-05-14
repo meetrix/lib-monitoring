@@ -109,7 +109,7 @@ export const videoSlice = createSlice({
   }
 });
 
-export const { actions } = videoSlice;
+export const { actions: videoActions } = videoSlice;
 
 export const selectVideo = (state: RootState): IVideoState => state.video;
 

@@ -75,10 +75,10 @@ class Call {
     await this.gotOffer_(rtcSessionDescriptionInit);
   };
 
-  close = async (): Promise<void> => {
+  close = (): void => {
     // this.traceEvent({ state: 'end' });
-    await this.pc1.close();
-    await this.pc2.close();
+    this.pc1.close();
+    this.pc2.close();
   };
 
   setIceCandidateFilter = (filter: any): void => {

@@ -81,7 +81,7 @@ export const bandwidthSlice = createSlice({
   }
 });
 
-export const { actions } = bandwidthSlice;
+export const { actions: bandwidthActions } = bandwidthSlice;
 
 export const selectBandwidth = (state: RootState): IBandwidthState => state.bandwidth;
 

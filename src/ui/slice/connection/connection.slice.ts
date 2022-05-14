@@ -95,7 +95,7 @@ export const connectionSlice = createSlice({
   }
 });
 
-export const { actions } = connectionSlice;
+export const { actions: connectionActions } = connectionSlice;
 
 export const selectConnection = (state: RootState): IConnectionState => state.connection;
 
