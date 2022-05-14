@@ -9,9 +9,9 @@
  */
 
 import Debug from 'debug';
-import { Dispatch, AnyAction } from '@reduxjs/toolkit';
+
 import { doGetUserMedia, setTimeoutWithProgressBar } from '../../testUtil';
-import { actions as audioActions } from '../../../ui/slice/audio/audio.slice';
+import { TestEvent, TestEventCallback } from '../TestEvent';
 
 const debug = Debug('audioTest');
 
@@ -49,27 +49,30 @@ const audioContext = new AudioContext();
 let aStream: any;
 let audioSource: any;
 let scriptNode: any;
-let dispatch: Dispatch<AnyAction>;
+let report: TestEventCallback;
 
-const runMicTest = async (dispatchArg: Dispatch<AnyAction>): Promise<void> => {
+const runMicTest = async (callback: TestEventCallback): Promise<boolean> => {
   // Resuming as per new spec after user interaction.
-  dispatch = dispatchArg;
-  dispatch(audioActions.startTest(''));
+  report = callback;
+  report(TestEvent.START, '');
 
   try {
     await audioContext.resume();
     aStream = await doGetUserMedia(constraints);
     await gotStream();
   } catch (error) {
-    dispatch(audioActions.addSubMessage(`WebAudio run failure: ${error}`));
-    dispatch(audioActions.endTest('failure'));
+    report(TestEvent.MESSAGE, `WebAudio run failure: ${error}`);
+    report(TestEvent.END, 'failure');
+    return false;
   }
+
+  return true;
 };
 
 const gotStream = async () => {
   if (!(await checkAudioTracks())) {
     debug('failure');
-    dispatch(audioActions.endTest('failure'));
+    report(TestEvent.END, 'failure');
     return;
   }
   await createAudioBuffer();
@@ -78,14 +81,10 @@ const gotStream = async () => {
 const checkAudioTracks = async () => {
   const audioTracks = await aStream.getAudioTracks();
   if (audioTracks.length < 1) {
-    dispatch(audioActions.addSubMessage('[ FAILED ] No audio track in returned stream.'));
+    report(TestEvent.MESSAGE, '[ FAILED ] No audio track in returned stream.');
     return false;
   }
-  dispatch(
-    dispatch(
-      audioActions.addSubMessage(`[ OK ] Audio track created using device=${audioTracks[0].label}`)
-    )
-  );
+  report(TestEvent.MESSAGE, `[ OK ] Audio track created using device=${audioTracks[0].label}`);
   return true;
 };
 
@@ -156,7 +155,7 @@ const onStopCollectingAudio = async () => {
   await audioSource.disconnect(scriptNode);
   await scriptNode.disconnect(audioContext.destination);
   await analyzeAudio(collectedAudio);
-  dispatch(audioActions.endTest('success'));
+  report(TestEvent.END, 'success');
 };
 
 const analyzeAudio = (channels: string | any[]) => {
@@ -168,17 +167,14 @@ const analyzeAudio = (channels: string | any[]) => {
     }
   }
   if (activeChannels.length === 0) {
-    dispatch(
-      audioActions.addSubMessage(
-        '[ FAILED ] No active input channels detected. Microphone ' +
-          'is most likely muted or broken, please check if muted in the ' +
-          'sound settings or physically on the device. Then rerun the test.'
-      )
+    report(
+      TestEvent.MESSAGE,
+      '[ FAILED ] No active input channels detected. Microphone ' +
+        'is most likely muted or broken, please check if muted in the ' +
+        'sound settings or physically on the device. Then rerun the test.'
     );
   } else {
-    dispatch(
-      audioActions.addSubMessage(`[ OK ] Active audio input channels: ${activeChannels.length}`)
-    );
+    report(TestEvent.MESSAGE, `[ OK ] Active audio input channels: ${activeChannels.length}`);
   }
   if (activeChannels.length === 2) {
     detectMono(channels[activeChannels[0]], channels[activeChannels[1]]);
@@ -218,27 +214,24 @@ const channelStats = (channelNumber: any, buffers: string | any[]) => {
   if (maxPeak > silentThreshold) {
     const dBPeak = dBFS(maxPeak);
     const dBRms = dBFS(maxRms);
-    dispatch(
-      audioActions.addSubMessage(
-        `[ INFO ] Channel ${channelNumber} levels: ${dBPeak.toFixed(1)} dB (peak), ${dBRms.toFixed(
-          1
-        )} dB (RMS)`
-      )
+    report(
+      TestEvent.MESSAGE,
+      `[ INFO ] Channel ${channelNumber} levels: ${dBPeak.toFixed(1)} dB (peak), ${dBRms.toFixed(
+        1
+      )} dB (RMS)`
     );
     if (dBRms < lowVolumeThreshold) {
-      dispatch(
-        audioActions.addSubMessage(
-          '[ FAILED ] Microphone input level is low, increase input ' +
-            'volume or move closer to the microphone.'
-        )
+      report(
+        TestEvent.MESSAGE,
+        '[ FAILED ] Microphone input level is low, increase input ' +
+          'volume or move closer to the microphone.'
       );
     }
     if (maxClipCount > clipCountThreshold) {
-      dispatch(
-        audioActions.addSubMessage(
-          '[ WARN ] Clipping detected! Microphone input level ' +
-            'is high. Decrease input volume or move away from the microphone.'
-        )
+      report(
+        TestEvent.MESSAGE,
+        '[ WARN ] Clipping detected! Microphone input level ' +
+          'is high. Decrease input volume or move away from the microphone.'
       );
     }
     return true;
@@ -265,9 +258,9 @@ const detectMono = (buffersL: string | any[], buffersR: any[]) => {
     }
   }
   if (diffSamples > 0) {
-    dispatch(audioActions.addSubMessage('[ INFO ] Stereo microphone detected.'));
+    report(TestEvent.MESSAGE, '[ INFO ] Stereo microphone detected.');
   } else {
-    dispatch(audioActions.addSubMessage('[ INFO ] Mono microphone detected.'));
+    report(TestEvent.MESSAGE, '[ INFO ] Mono microphone detected.');
   }
 };
 

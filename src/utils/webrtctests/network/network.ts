@@ -9,43 +9,43 @@
  */
 
 import Debug from 'debug';
-import { Dispatch } from '@reduxjs/toolkit';
+
 import Call from '../../call';
-import { actions as networkActions } from '../../../ui/slice/network/network.slice';
 import { asyncCreateTurnConfig } from '../../testUtil';
+import { TestEvent, TestEventCallback } from '../TestEvent';
 
 const debug = Debug('networkTest');
 
 let protocol: string;
 let params: any;
 let type: string;
-let dispatch: Dispatch;
+let report: TestEventCallback;
 let CallClass: Call;
 
 const initNetworkTest = async (
-  dispatchArg: Dispatch,
+  callback: TestEventCallback,
   protocolArg: string,
   paramsArg: any,
   typeArg: string
-) => {
+): Promise<boolean> => {
   type = typeArg;
-  dispatch = dispatchArg;
+  report = callback;
   protocol = protocolArg;
   params = paramsArg;
   CallClass = new Call({});
-  dispatch(networkActions.startTest(type));
-  await runNetworkTest();
+  report(TestEvent.START, type);
+  return runNetworkTest();
 };
 
-const runNetworkTest = async () => {
+const runNetworkTest = async (): Promise<boolean> => {
   debug('runNetworkTest()');
   // Do not create turn config for IPV6 test.
   if (type === 'ipv6') {
-    gatherCandidates({});
+    return gatherCandidates({});
   } else {
     let config = asyncCreateTurnConfig();
     config = filterConfig(config);
-    await gatherCandidates(config);
+    return gatherCandidates(config);
   }
 };
 
@@ -82,7 +82,7 @@ const filterConfig = (config: RTCConfiguration) => {
 // Create a PeerConnection, and gather candidates using RTCConfig |config|
 // and ctor params |params|. Succeed if any candidates pass the |isGood|
 // check, fail if we complete gathering without any passing.
-const gatherCandidates = async (config: any) => {
+const gatherCandidates = async (config: any): Promise<boolean> => {
   debug('gatherCandidates()');
   let pc: RTCPeerConnection;
   let iceCandidateFilterFunction: Function;
@@ -97,68 +97,64 @@ const gatherCandidates = async (config: any) => {
     pc = new RTCPeerConnection({ ...config, ...params });
   } catch (error) {
     if (params !== null && params.optional[0].googIPv6) {
-      dispatch(
-        networkActions.addSubMessage([
-          type,
-          '[ WARN ] Failed to create peer connection, IPv6 ' +
-            'might not be setup/supported on the network.'
-        ])
-      );
+      report(TestEvent.MESSAGE, [
+        type,
+        '[ WARN ] Failed to create peer connection, IPv6 ' +
+          'might not be setup/supported on the network.'
+      ]);
     } else {
-      dispatch(
-        networkActions.addSubMessage([
-          type,
-          `[ FAILED ] Failed to create peer connection: ${error}`
-        ])
-      );
+      report(TestEvent.MESSAGE, [type, `[ FAILED ] Failed to create peer connection: ${error}`]);
     }
 
-    dispatch(networkActions.endTest([type, 'failure']));
-    return;
+    report(TestEvent.END, [type, 'failure']);
+    return false;
   }
 
-  // In our candidate callback, stop if we get a candidate that passes
-  // |isGood|.
-  pc.addEventListener('icecandidate', e => {
-    // Once we've decided, ignore future callbacks.
-    // if (e.currentTarget?.signalingState === 'closed') {
-    //   return;
-    // }
-    // debug(e);
-    if (e.candidate) {
-      const parsed = CallClass.parseCandidate(e.candidate.candidate);
-      if (iceCandidateFilterFunction(parsed)) {
-        dispatch(
-          networkActions.addSubMessage([
+  const promise = new Promise<boolean>(async resolve => {
+    // In our candidate callback, stop if we get a candidate that passes
+    // |isGood|.
+    pc.addEventListener('icecandidate', e => {
+      // TODO: Fix: events are firing after we end the method
+      // Once we've decided, ignore future callbacks.
+      // if (e.currentTarget?.signalingState === 'closed') {
+      //   return;
+      // }
+      // debug(e);
+      if (e.candidate) {
+        const parsed = CallClass.parseCandidate(e.candidate.candidate);
+        if (iceCandidateFilterFunction(parsed)) {
+          report(TestEvent.MESSAGE, [
             type,
             `[ OK ] Gathered candidate of Type: ${parsed.type} Protocol: ${parsed.protocol} Address: ${parsed.address}`
-          ])
-        );
+          ]);
+          pc.close();
+          // = null;
+          report(TestEvent.END, [type, 'success']);
+          resolve(true);
+          return;
+        }
+        resolve(false);
+      } else {
         pc.close();
-        // = null;
-        dispatch(networkActions.endTest([type, 'success']));
-      }
-    } else {
-      pc.close();
-      // pc = null;
-      if (type === 'ipv6') {
-        dispatch(
-          networkActions.addSubMessage([
+        // pc = null;
+        if (type === 'ipv6') {
+          report(TestEvent.MESSAGE, [
             type,
             '[ WARN ] Failed to gather IPv6 candidates, it ' +
               'might not be setup/supported on the network.'
-          ])
-        );
-      } else {
-        dispatch(
-          networkActions.addSubMessage([type, '[ FAILED ] Failed to gather specified candidates'])
-        );
+          ]);
+        } else {
+          report(TestEvent.MESSAGE, [type, '[ FAILED ] Failed to gather specified candidates']);
+        }
+        report(TestEvent.END, [type, 'failure']);
+        resolve(false);
       }
-      dispatch(networkActions.endTest([type, 'failure']));
-    }
+    });
   });
 
   await createAudioOnlyReceiveOffer(pc);
+
+  return promise;
 };
 
 // Create an audio-only, recvonly offer, and setLD with it.
@@ -176,29 +172,32 @@ const sleep = (time: number): Promise<void> => {
   });
 };
 
-const runNetworkTests = async (dispatchArg: Dispatch): Promise<void> => {
+const runNetworkTests = async (callback: TestEventCallback): Promise<boolean> => {
   await sleep(1000);
   debug(Date.now());
 
   // Test whether it can connect via UDP to a TURN server
   // Get a TURN config, and try to get a relay candidate using UDP.
 
-  await initNetworkTest(dispatchArg, 'udp', null, 'udp');
+  const udp = await initNetworkTest(callback, 'udp', null, 'udp');
   await sleep(5000);
   debug(Date.now());
 
   // Test whether it can connect via TCP to a TURN server
   // Get a TURN config, and try to get a relay candidate using TCP.
 
-  await initNetworkTest(dispatchArg, 'tcp', null, 'tcp');
+  const tcp = await initNetworkTest(callback, 'tcp', null, 'tcp');
   await sleep(5000);
   debug(Date.now());
 
   // Test whether it is IPv6 enabled (TODO: test IPv6 to a destination).
   // Turn on IPv6, and try to get an IPv6 host candidate.
 
-  await initNetworkTest(dispatchArg, '', { optional: [{ googIPv6: true }] }, 'ipv6');
+  const ipv6 = await initNetworkTest(callback, '', { optional: [{ googIPv6: true }] }, 'ipv6');
   await sleep(5000);
   debug(Date.now());
+
+  return [udp, tcp, ipv6].every(Boolean);
 };
+
 export default runNetworkTests;

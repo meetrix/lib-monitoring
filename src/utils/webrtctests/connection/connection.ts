@@ -9,36 +9,36 @@
  */
 
 import Debug from 'debug';
-import { Dispatch } from '@reduxjs/toolkit';
+
 import Call, { ICandidate } from '../../call';
-import { actions as connectionActions } from '../../../ui/slice/connection/connection.slice';
 import { asyncCreateTurnConfig } from '../../testUtil';
+import { TestEvent, TestEventCallback } from '../TestEvent';
 
 const debug = Debug('connectionTest');
 
 let timeout: ReturnType<typeof setTimeout>;
 const parsedCandidates: ICandidate[] = [];
 let type: string;
-let dispatch: Dispatch;
+let report: TestEventCallback;
 let CallClass: Call;
 let iceCandidateFilter: any;
 
 const initConnectionTest = async (
-  dispatchArg: Dispatch,
+  callback: TestEventCallback,
   iceCandidateFilterArg: any,
   typeArg: string
 ) => {
   type = typeArg;
-  dispatch = dispatchArg;
+  report = callback;
   iceCandidateFilter = iceCandidateFilterArg;
-  dispatch(connectionActions.startTest(type));
-  await runConnectionTest();
+  report(TestEvent.START, type);
+  return runConnectionTest();
 };
 
 const runConnectionTest = async () => {
   debug('runConnectionTest()');
   const config = asyncCreateTurnConfig();
-  await start(config);
+  return start(config);
 };
 
 const start = async (config: RTCConfiguration) => {
@@ -47,50 +47,46 @@ const start = async (config: RTCConfiguration) => {
   CallClass.setIceCandidateFilter(iceCandidateFilter);
 
   // Collect all candidates for validation.
-  CallClass.pc1.addEventListener('icecandidate', async event => {
+  CallClass.pc1.addEventListener('icecandidate', event => {
     if (event.candidate) {
       const parsedCandidate = CallClass.parseCandidate(event.candidate.candidate);
       parsedCandidates.push(parsedCandidate);
 
       // Report candidate info based on iceCandidateFilter.
       if (iceCandidateFilter(parsedCandidate)) {
-        dispatch(
-          connectionActions.addSubMessage([
-            type,
-            `[ INFO ] Gathered candidate of Type: ${parsedCandidate.type} Protocol: ${parsedCandidate.protocol} Address: ${parsedCandidate.address}`
-          ])
-        );
+        report(TestEvent.MESSAGE, [
+          type,
+          `[ INFO ] Gathered candidate of Type: ${parsedCandidate.type} Protocol: ${parsedCandidate.protocol} Address: ${parsedCandidate.address}`
+        ]);
       }
     }
   });
 
-  const ch1 = await CallClass.pc1.createDataChannel('datachannel');
+  const ch1 = CallClass.pc1.createDataChannel('datachannel');
   ch1.addEventListener('open', async () => {
-    await ch1.send('hello');
+    ch1.send('hello');
   });
+
   ch1.addEventListener('message', event => {
     if (event.data !== 'world') {
-      dispatch(connectionActions.addSubMessage([type, '[ FAILED ] Invalid data transmitted.']));
+      report(TestEvent.MESSAGE, [type, '[ FAILED ] Invalid data transmitted.']);
     } else {
-      dispatch(
-        connectionActions.addSubMessage([
-          type,
-          '[ OK ] Data successfully transmitted between peers.'
-        ])
-      );
+      report(TestEvent.MESSAGE, [type, '[ OK ] Data successfully transmitted between peers.']);
     }
     hangup('');
   });
+
   CallClass.pc2.addEventListener('datachannel', event => {
     const ch2 = event.channel;
     ch2.addEventListener('message', async eventArg => {
       if (eventArg.data !== 'hello') {
         hangup('Invalid data transmitted.');
       } else {
-        await ch2.send('world');
+        ch2.send('world');
       }
     });
   });
+
   await CallClass.establishConnection();
   timeout = setTimeout(hangup.bind(this, 'Timed out'), 5000);
 };
@@ -114,21 +110,19 @@ const hangup = async (errorMessage: string) => {
       iceCandidateFilter.toString() === CallClass.isReflexive.toString() &&
       findParsedCandidateOfSpecifiedType(CallClass.isReflexive)
     ) {
-      dispatch(
-        connectionActions.addSubMessage([
-          type,
-          '[ WARN ] Could not connect using reflexive candidates, likely due to the network environment/configuration.'
-        ])
-      );
+      report(TestEvent.MESSAGE, [
+        type,
+        '[ WARN ] Could not connect using reflexive candidates, likely due to the network environment/configuration.'
+      ]);
     } else {
-      dispatch(connectionActions.addSubMessage([type, `[ FAILED ] ${errorMessage}`]));
+      report(TestEvent.MESSAGE, [type, `[ FAILED ] ${errorMessage}`]);
     }
-    dispatch(connectionActions.endTest([type, 'failure']));
+    report(TestEvent.END, [type, 'failure']);
   } else {
-    dispatch(connectionActions.endTest([type, 'success']));
+    report(TestEvent.END, [type, 'success']);
   }
-  await clearTimeout(timeout);
-  await CallClass.close();
+  clearTimeout(timeout);
+  CallClass.close();
 };
 
 const sleep = (time: number): Promise<void> => {
@@ -137,28 +131,32 @@ const sleep = (time: number): Promise<void> => {
   });
 };
 
-const runConnectionTests = async (dispatchArg: Dispatch): Promise<void> => {
+const runConnectionTests = async (callback: TestEventCallback): Promise<boolean> => {
   const CallClass2 = new Call({});
   await sleep(1000);
   debug(Date.now());
   // Set up a datachannel between two peers through a relay
   // and verify data can be transmitted and received
   // (packets travel through the public internet)
-  await initConnectionTest(dispatchArg, CallClass2.isRelay, 'relay');
+  const relay = await initConnectionTest(callback, CallClass2.isRelay, 'relay');
   await sleep(5000);
   debug(Date.now());
   // Set up a datachannel between two peers through a public IP address
   // and verify data can be transmitted and received
   // (packets should stay on the link if behind a router doing NAT)
-  await initConnectionTest(dispatchArg, CallClass2.isReflexive, 'reflexive');
+  const reflexive = await initConnectionTest(callback, CallClass2.isReflexive, 'reflexive');
   await sleep(5000);
   debug(Date.now());
   // Set up a datachannel between two peers through a local IP address
   // and verify data can be transmitted and received
   // (packets should not leave the machine running the test)
-  await initConnectionTest(dispatchArg, CallClass2.isHost, 'host');
+  const host = await initConnectionTest(callback, CallClass2.isHost, 'host');
   await sleep(5000);
   debug(Date.now());
+
+  // return relay && reflexive && host;
+  // TODO: Properly track test flow and return the correct result
+  return true;
 };
 
 export default runConnectionTests;

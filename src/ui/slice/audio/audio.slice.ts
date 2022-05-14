@@ -30,7 +30,7 @@ export const audioSlice = createSlice({
   }
 });
 
-export const { actions } = audioSlice;
+export const { actions: audioActions } = audioSlice;
 
 export const selectAudio = (state: RootState): IAudioState => state.audio;
 

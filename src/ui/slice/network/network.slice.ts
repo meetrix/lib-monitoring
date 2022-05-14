@@ -95,7 +95,7 @@ export const networkSlice = createSlice({
   }
 });
 
-export const { actions } = networkSlice;
+export const { actions: networkActions } = networkSlice;
 
 export const selectNetwork = (state: RootState): INetworkState => state.network;
 

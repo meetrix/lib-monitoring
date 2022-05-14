@@ -1,7 +1,30 @@
 /* eslint-disable import/named */
-// eslint-disable-next-line import/prefer-default-export
-export { default as runMicTest } from './audio/audio';
-export { default as runVideoTests } from './video/video';
-export { default as runNetworkTests } from './network/network';
-export { default as runConnectionTests } from './connection/connection';
-export { default as runBandwidthTests } from './bandwidth/bandwidth';
+
+import runBandwidthTests from './bandwidth/bandwidth';
+import runConnectionTests from './connection/connection';
+import runNetworkTests from './network/network';
+
+import { TestEventCallback as TEC } from './TestEvent';
+
+// Wrapped API
+
+export { default as testBrowser } from './browser/browser';
+export { default as testMicrophone } from './audio/audio';
+export { default as testCamera } from './video/video';
+
+// Temporary facade to unify the network APIs
+export async function testNetwork(callback: TestEventCallback): Promise<boolean> {
+  const networkStatus = await runNetworkTests((event, ...args: any) =>
+    callback(event, ['network', ...args])
+  );
+  const connectionStatus = await runConnectionTests((event, ...args: any) =>
+    callback(event, ['connection', ...args])
+  );
+  const bandwidthStatus = await runBandwidthTests((event, ...args: any) =>
+    callback(event, ['bandwidth', ...args])
+  );
+
+  return networkStatus && connectionStatus && bandwidthStatus;
+}
+
+export type TestEventCallback = TEC;
