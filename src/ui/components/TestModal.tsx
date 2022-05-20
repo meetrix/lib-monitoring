@@ -1,8 +1,16 @@
 import React from 'react';
-import { Modal, Button, ButtonProps, Theme, Typography, Box, Divider, IconButton } from '@mui/material';
+import {
+  Modal,
+  Button,
+  Theme,
+  Typography,
+  Box,
+  Divider,
+  IconButton,
+  ButtonProps,
+} from '@mui/material';
 import { withStyles, createStyles, WithStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import clsx from 'clsx';
 import TestListRow from './TestListRow';
 
 const styles = (theme: Theme) => {
@@ -20,14 +28,12 @@ const styles = (theme: Theme) => {
       padding: '3vw',
       borderRadius: 5,
     },
-    listWrapper: {
-
-    },
+    listWrapper: {},
     bottomWrapper: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'flex-start',
-    }
+    },
   });
 };
 
@@ -51,11 +57,10 @@ const ModalListData = [
     label: 'Checking your network connection',
     type: 'unset',
     message: undefined,
-  }
-]
+  },
+];
 
-export interface TestModalProps
-  extends WithStyles<ButtonProps & typeof styles> {
+export interface TestModalProps extends WithStyles<ButtonProps & typeof styles> {
   label?: string;
   open: boolean;
   handleClose?: () => {};
@@ -70,38 +75,41 @@ export const TestModal: React.FC<TestModalProps> = ({
 }: TestModalProps) => {
   return (
     <Modal
-        open={open}
-        onClose={handleClose}
-        className={classes.root}
-        disableEnforceFocus
-        aria-labelledby="test-modal-title"
-        aria-describedby="test-modal-description"
-      >
-        <Box className={classes.contentWrapper}>
-          <IconButton aria-label="close" className={classes.closeButton}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-          <Typography id="test-modal-title" variant="h6" component="h2">
-            Let’s test your devices and network connection
-          </Typography>
-          <Typography id="test-modal-description" variant="caption" color="darkgray">
+      open={open}
+      onClose={handleClose}
+      className={classes.root}
+      disableEnforceFocus
+      aria-labelledby="test-modal-title"
+      aria-describedby="test-modal-description"
+    >
+      <Box className={classes.contentWrapper}>
+        <IconButton aria-label="close" className={classes.closeButton}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+        <Typography id="test-modal-title" variant="h6" component="h2">
+          Let’s test your devices and network connection
+        </Typography>
+        <Typography id="test-modal-description" variant="caption" color="darkgray">
           Please do not close this window until the test completes
-          </Typography>
-          <div className={classes.listWrapper}>
-            {ModalListData.map((data) => {
-              return <TestListRow label={data?.label} type={data.type} message={data?.message} />
-            })}
-          </div>
-          <Divider />
-          <TestListRow label="Unfortunately you can’t make video calls through this browser, and your devices is not compatible." type="blackIcon" />
-          <div className={classes.bottomWrapper}>
-            <Typography id="test-modal-title" variant="caption" color="darkgray">
+        </Typography>
+        <div className={classes.listWrapper}>
+          {ModalListData.map(data => {
+            return <TestListRow label={data?.label} type={data.type} message={data?.message} />;
+          })}
+        </div>
+        <Divider />
+        <TestListRow
+          label="Unfortunately you can’t make video calls through this browser, and your devices is not compatible."
+          type="blackIcon"
+        />
+        <div className={classes.bottomWrapper}>
+          <Typography id="test-modal-title" variant="caption" color="darkgray">
             TEST ID :234 - VIEW LOG
-            </Typography>
-            <Button>Test again</Button>
-          </div>
-        </Box>
-      </Modal>
+          </Typography>
+          <Button>Test again</Button>
+        </div>
+      </Box>
+    </Modal>
   );
 };
 

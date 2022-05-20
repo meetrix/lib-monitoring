@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Typography, Chip, Container, Grid, Button } from '@mui/material';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { Typography, Container, Grid, Button } from '@mui/material';
 import { v4 as uuid } from 'uuid';
 
 import { testBrowser, testCamera, testMicrophone, testNetwork } from '../../utils/webrtctests';
@@ -13,9 +14,13 @@ import { networkActions, selectNetwork } from '../slice/network/network.slice';
 import { connectionActions, selectConnection } from '../slice/connection/connection.slice';
 import { bandwidthActions, selectBandwidth } from '../slice/bandwidth/bandwidth.slice';
 import WebrtcSubTestGrid from './WebrtcSubTestGrid';
-import { useSelector } from 'react-redux';
 
-type ActionsType = typeof audioActions | typeof videoActions | typeof networkActions | typeof connectionActions | typeof bandwidthActions;
+type ActionsType =
+  | typeof audioActions
+  | typeof videoActions
+  | typeof networkActions
+  | typeof connectionActions
+  | typeof bandwidthActions;
 
 // TODO Generate proper error messages (human readable), standardize state
 const useStatus = () => {
@@ -29,30 +34,32 @@ const useStatus = () => {
   let overallNetworkStatus = '';
   if (
     [networkStatus.status, connectionStatus.status, bandwidthStatus.status].every(
-      status => status === 'success'
+      status => status === 'success',
     )
   ) {
     overallNetworkStatus = 'success';
   } else if (
     [networkStatus.status, connectionStatus.status, bandwidthStatus.status].some(
-      status => status === 'failure'
+      status => status === 'failure',
     )
   ) {
     overallNetworkStatus = 'failure';
   } else if (
     [networkStatus.status, connectionStatus.status, bandwidthStatus.status].some(
-      status => status === 'running'
+      status => status === 'running',
     )
   ) {
     overallNetworkStatus = 'running';
   }
 
-  let overallNetworkError = [networkStatus.error, connectionStatus.error, bandwidthStatus.error].filter(Boolean).join(', ');
+  let overallNetworkError = [networkStatus.error, connectionStatus.error, bandwidthStatus.error]
+    .filter(Boolean)
+    .join(', ');
   let overallSubMessages = {
     network: networkStatus.subMessages,
     connection: connectionStatus.subMessages,
     bandwidth: bandwidthStatus.subMessages,
-  }
+  };
   let overallSubStatus = {
     network: networkStatus.subStatus,
     connection: connectionStatus.subStatus,
@@ -68,7 +75,7 @@ const useStatus = () => {
       error: overallNetworkError,
       subMessages: overallSubMessages,
       subStatus: overallSubStatus,
-    }
+    },
   } as { [x: string]: any };
 };
 
@@ -80,16 +87,14 @@ const testDetails = [
 ];
 
 export type WebrtcTestGridProps = {
-  t1: string
-}
+  t1: string;
+};
 
-export const WebrtcTestGrid = ({
-  t1
-}: WebrtcTestGridProps) => {
+export const WebrtcTestGrid = ({ t1 }: WebrtcTestGridProps) => {
   const dispatch = useAppDispatch();
 
   const mapCallbackToDispatch: (actions: ActionsType) => TestEventCallback = (
-    actions: ActionsType
+    actions: ActionsType,
   ) => (event, args) => {
     console.log('>>>', event, args);
 
@@ -111,7 +116,7 @@ export const WebrtcTestGrid = ({
     await testMicrophone(mapCallbackToDispatch(audioActions));
     await testCamera(mapCallbackToDispatch(videoActions));
     await testNetwork((event, args) => {
-      const [stage, ...rest] = args as unknown as [string, any];
+      const [stage, ...rest] = (args as unknown) as [string, any];
       switch (stage) {
         case 'network':
           mapCallbackToDispatch(networkActions)(event, rest);
@@ -141,35 +146,28 @@ export const WebrtcTestGrid = ({
           <Typography>Please do not close this window until the test completes</Typography>
         </Grid>
 
-        {testDetails.map((details) => {
+        {testDetails.map(details => {
           return (
-            <Grid item
-              key={uuid()}>
+            <Grid item key={uuid()}>
               <WebrtcSubTestGrid
                 title={details.header}
                 statusText={status[details.name].status}
                 key={uuid()}
               />
             </Grid>
-          )
+          );
         })}
 
         <Grid item>
-          <WebrtcSubTestGrid
-            title='All test passed'
-            statusText=''
-          />
+          <WebrtcSubTestGrid title="All test passed" statusText="" />
         </Grid>
 
         <Grid item>
-          <Button
-            onClick={handleStart}>
-            Test
-          </Button>
+          <Button onClick={handleStart}>Test</Button>
         </Grid>
       </Grid>
     </Container>
-  )
-}
+  );
+};
 
 export default WebrtcTestGrid;
