@@ -14,6 +14,7 @@ import { networkActions, selectNetwork } from '../slice/network/network.slice';
 import { connectionActions, selectConnection } from '../slice/connection/connection.slice';
 import { bandwidthActions, selectBandwidth } from '../slice/bandwidth/bandwidth.slice';
 import WebrtcSubTestGrid from './WebrtcSubTestGrid';
+import { TestModalContainer } from '../containers/TestModalContainer';
 
 type ActionsType =
   | typeof audioActions
@@ -91,13 +92,12 @@ export type WebrtcTestGridProps = {
 };
 
 export const WebrtcTestGrid = ({ t1 }: WebrtcTestGridProps) => {
+  const [testModalOpen, setTestModalOpen] = React.useState(false);
   const dispatch = useAppDispatch();
 
   const mapCallbackToDispatch: (actions: ActionsType) => TestEventCallback = (
     actions: ActionsType,
   ) => (event, args) => {
-    console.log('>>>', event, args);
-
     switch (event) {
       case TestEvent.START:
         dispatch(actions.startTest(args));
@@ -111,30 +111,7 @@ export const WebrtcTestGrid = ({ t1 }: WebrtcTestGridProps) => {
     }
   };
 
-  const handleStart = async () => {
-    await testBrowser(mapCallbackToDispatch(browserActions));
-    await testMicrophone(mapCallbackToDispatch(audioActions));
-    await testCamera(mapCallbackToDispatch(videoActions));
-    await testNetwork((event, args) => {
-      const [stage, ...rest] = (args as unknown) as [string, any];
-      switch (stage) {
-        case 'network':
-          mapCallbackToDispatch(networkActions)(event, rest);
-          break;
-        case 'connection':
-          mapCallbackToDispatch(connectionActions)(event, rest);
-          break;
-        case 'bandwidth':
-          mapCallbackToDispatch(bandwidthActions)(event, rest);
-          break;
-        default:
-          break;
-      }
-    });
-  };
-
   const status = useStatus();
-  console.log('>>>', status);
 
   return (
     <Container maxWidth="xl">
@@ -145,6 +122,8 @@ export const WebrtcTestGrid = ({ t1 }: WebrtcTestGridProps) => {
         <Grid item>
           <Typography>Please do not close this window until the test completes</Typography>
         </Grid>
+
+        <TestModalContainer open={testModalOpen} onClose={() => setTestModalOpen(false)} />
 
         {testDetails.map(details => {
           return (
@@ -163,7 +142,7 @@ export const WebrtcTestGrid = ({ t1 }: WebrtcTestGridProps) => {
         </Grid>
 
         <Grid item>
-          <Button onClick={handleStart}>Test</Button>
+          <Button onClick={() => setTestModalOpen(true)}>Start test</Button>
         </Grid>
       </Grid>
     </Container>

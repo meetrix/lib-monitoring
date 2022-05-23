@@ -63,33 +63,31 @@ const styles = (theme: Theme) => {
 
 export interface TestListRowProps extends WithStyles<ButtonProps & typeof styles> {
   label?: string;
-  type?: 'success' | 'error' | 'unset' | 'running' | 'blackIcon' | string;
+  status?: 'success' | 'failure' | '' | 'running' | 'blackIcon' | string;
   message?: string;
 }
 
 export const TestListRow: React.FC<TestListRowProps> = ({
   classes,
   label,
-  type = 'unset',
+  status = '',
   message,
 }: TestListRowProps) => {
   const renderIcon = () => {
-    switch (type) {
+    switch (status) {
       case 'success':
         return <CheckCircleIcon fontSize="small" />;
-      case 'error':
+      case 'failure':
         return <ErrorIcon fontSize="small" />;
       case 'running':
         return <DataSaverOffIcon fontSize="small" className={classes.rotatingEffect} />;
-      case 'blackIcon':
-        return <ErrorIcon fontSize="small" />;
       default:
         return null;
     }
   };
   return (
     <div className={classes.root}>
-      <div className={clsx(classes.applyFlex, `${type}`)}>
+      <div className={clsx(classes.applyFlex, `${status}`)}>
         <div className={classes.applyFlex}>
           <div className={classes.icon}>{renderIcon()}</div>
           <Typography variant="body2" className={clsx(classes.label, 'label-styles')}>

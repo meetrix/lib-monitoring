@@ -18,27 +18,27 @@ const Template: ComponentStory<typeof TestListRow> = (args) => <TestListRow {...
 
 export const Success = Template.bind({});
 Success.args = {
-  type: 'success',
+  status: 'success',
   message: 'No issues found',
 };
 
 export const Fail = Template.bind({});
 Fail.args = {
-  type: 'error',
+  status: 'error',
   message: 'There is a problem with your microphone',
 };
 
 export const Running = Template.bind({});
 Running.args = {
-  type: 'running',
+  status: 'running',
 };
 
 export const Result = Template.bind({});
 Result.args = {
-  type: 'blackIcon',
+  status: 'blackIcon',
 };
 
 export const Unset = Template.bind({});
 Unset.args = {
-  type: 'unset',
+  status: 'unset',
 };

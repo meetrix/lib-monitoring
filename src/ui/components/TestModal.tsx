@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Modal,
   Button,
@@ -37,46 +37,74 @@ const styles = (theme: Theme) => {
   });
 };
 
-const ModalListData = [
-  {
-    label: 'Checking your browser',
-    type: 'error',
-    message: 'Your browser is not compatible',
-  },
-  {
-    label: 'Checking your microphone',
-    type: 'success',
-    message: 'No issues found',
-  },
-  {
-    label: 'Checking your camera',
-    type: 'running',
-    message: undefined,
-  },
-  {
-    label: 'Checking your network connection',
-    type: 'unset',
-    message: undefined,
-  },
-];
+export interface ITestResultData {
+  key: string;
+  label: string;
+  status: string;
+  message: string;
+  subMessages: { [x: string]: string };
+  subStatus: { [x: string]: string };
+}
 
 export interface TestModalProps extends WithStyles<ButtonProps & typeof styles> {
   label?: string;
   open: boolean;
-  handleClose?: () => {};
+  data: ITestResultData[];
+  onClose?: () => void;
+  onRetry?: () => void;
+}
+
+function deriveStatus(data: ITestResultData[]) {
+  const status = data.every(({ status }) => status === '')
+    ? ''
+    : data.every(({ status }) => status === 'success')
+    ? 'success'
+    : data.some(({ status }) => status === 'running' || status === '')
+    ? 'running'
+    : 'failure';
+
+  let statusMessage = 'Tests not run';
+  switch (status) {
+    case 'success':
+      statusMessage = 'All tests passed';
+      break;
+    case 'failure':
+      statusMessage =
+        'Unfortunately you can’t make video calls through this browser, and your devices is not compatible.';
+      break;
+    case 'running':
+      statusMessage = 'Running tests';
+      break;
+    default:
+      break;
+  }
+  return { status, statusMessage };
 }
 
 export const TestModal: React.FC<TestModalProps> = ({
   classes,
   label,
   open,
-  handleClose,
+  data,
+  onClose: handleClose,
+  onRetry: handleRetry,
   ...otherProps
 }: TestModalProps) => {
+  var { status, statusMessage } = deriveStatus(data);
+
+  useEffect(() => {
+    if (open && status === '') {
+      handleRetry?.();
+    }
+  }, [handleRetry, open, status]);
+
   return (
     <Modal
       open={open}
-      onClose={handleClose}
+      onClose={(event, reason) => {
+        if (/*reason === 'backdropClick' && */ status === 'running') return;
+        handleClose?.();
+      }}
       className={classes.root}
       disableEnforceFocus
       aria-labelledby="test-modal-title"
@@ -93,20 +121,19 @@ export const TestModal: React.FC<TestModalProps> = ({
           Please do not close this window until the test completes
         </Typography>
         <div className={classes.listWrapper}>
-          {ModalListData.map(data => {
-            return <TestListRow label={data?.label} type={data.type} message={data?.message} />;
+          {data.map(row => {
+            return <TestListRow {...row} />;
           })}
         </div>
         <Divider />
-        <TestListRow
-          label="Unfortunately you can’t make video calls through this browser, and your devices is not compatible."
-          type="blackIcon"
-        />
+        <TestListRow label={statusMessage} status={status} />
         <div className={classes.bottomWrapper}>
           <Typography id="test-modal-title" variant="caption" color="darkgray">
             TEST ID :234 - VIEW LOG
           </Typography>
-          <Button>Test again</Button>
+          <Button disabled={status === 'running'} onClick={handleRetry}>
+            Test again
+          </Button>
         </div>
       </Box>
     </Modal>
