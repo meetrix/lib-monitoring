@@ -17,6 +17,7 @@ const styles = (theme: Theme) => {
   return createStyles({
     root: {
       width: 'clamp(550px ,40vw, 700px)',
+      margin: 'auto',
     },
     closeButton: {
       position: 'absolute !important' as 'absolute',

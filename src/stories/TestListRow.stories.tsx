@@ -1,7 +1,7 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import  TestListRow  from '../ui/components/TestListRow';
+import TestListRow from '../ui/components/TestListRow';
 
 export default {
   title: 'Example/TestListRow',
@@ -9,12 +9,12 @@ export default {
   argTypes: {
     label: {
       defaultValue: 'Checking your microphone',
-      control: { type: 'text' }
+      control: { type: 'text' },
     },
   },
 } as ComponentMeta<typeof TestListRow>;
 
-const Template: ComponentStory<typeof TestListRow> = (args) => <TestListRow {...args} />;
+const Template: ComponentStory<typeof TestListRow> = args => <TestListRow {...args} />;
 
 export const Success = Template.bind({});
 Success.args = {
@@ -24,7 +24,7 @@ Success.args = {
 
 export const Fail = Template.bind({});
 Fail.args = {
-  status: 'error',
+  status: 'failure',
   message: 'There is a problem with your microphone',
 };
 
@@ -33,12 +33,7 @@ Running.args = {
   status: 'running',
 };
 
-export const Result = Template.bind({});
-Result.args = {
-  status: 'blackIcon',
-};
-
 export const Unset = Template.bind({});
 Unset.args = {
-  status: 'unset',
+  status: '',
 };

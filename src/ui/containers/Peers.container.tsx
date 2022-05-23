@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
-import { getUrlParams } from '../../utils/urlUtils';
-import WebrtcTestGrid from '../components/WebrtcTestGrid';
+import { Button } from '@mui/material';
+
+import { TestModalContainer } from '../containers/TestModalContainer';
 
 //  connect<{}, undefined, undefined, undefined>(
 //   'peers',
@@ -16,11 +17,17 @@ import WebrtcTestGrid from '../components/WebrtcTestGrid';
 //   return <WebrtcTestGrid t1='hello'></WebrtcTestGrid>;
 // })
 
-
 interface IPeers {}
 
 const PeersContainer: React.FC<IPeers> = ({}: IPeers) => {
-  return <WebrtcTestGrid t1='hello'></WebrtcTestGrid>;
+  const [testModalOpen, setTestModalOpen] = React.useState(false);
+  
+  return (
+    <div>
+      <TestModalContainer open={testModalOpen} onClose={() => setTestModalOpen(false)} />
+      <Button onClick={() => setTestModalOpen(true)}>Start</Button>
+    </div>
+  );
 };
 
 export default memo(PeersContainer);

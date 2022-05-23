@@ -18,7 +18,7 @@ export const sampleData = [
   {
     key: 'browser',
     label: 'Checking your browser',
-    status: 'error',
+    status: 'failure',
     message: 'Your browser is not compatible',
     subMessages: {},
     subStatus: {},
@@ -42,7 +42,7 @@ export const sampleData = [
   {
     key: 'network',
     label: 'Checking your network connection',
-    status: 'unset',
+    status: '',
     message: '',
     subMessages: {},
     subStatus: {},
