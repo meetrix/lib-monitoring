@@ -1,38 +1,39 @@
-/* eslint-disable prefer-destructuring */
 import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../store/store';
 
-export interface ISubMessages {
+import { RootState } from '../../store/store';
+import { ISubMessages, ISubStatus, ITestState } from '../types';
+
+export interface IConnectionSubMessages extends ISubMessages {
   relay: string[];
   reflexive: string[];
   host: string[];
 }
-export interface ISubStatus {
+export interface IConnectionSubStatus extends ISubStatus {
   relay: string;
   reflexive: string;
   host: string;
 }
 
-export interface IConnectionState {
-  status: string;
-  subMessages: ISubMessages;
-  subStatus: ISubStatus;
+export interface IConnectionTestState extends ITestState {
+  status: '' | 'running' | 'success' | 'failure';
+  subMessages: IConnectionSubMessages;
+  subStatus: IConnectionSubStatus;
   error: string;
 }
 
-const initialState: IConnectionState = {
+const initialState: IConnectionTestState = {
   status: '',
   subMessages: {
     relay: ['[ INFO ] Test not run yet.'],
     reflexive: ['[ INFO ] Test not run yet.'],
-    host: ['[ INFO ] Test not run yet.']
+    host: ['[ INFO ] Test not run yet.'],
   },
   subStatus: {
     relay: '',
     reflexive: '',
-    host: ''
+    host: '',
   },
-  error: ''
+  error: '',
 };
 
 export const connectionSlice = createSlice({
@@ -91,12 +92,12 @@ export const connectionSlice = createSlice({
         default:
           break;
       }
-    }
-  }
+    },
+  },
 });
 
 export const { actions: connectionActions } = connectionSlice;
 
-export const selectConnection = (state: RootState): IConnectionState => state.connection;
+export const selectConnection = (state: RootState): IConnectionTestState => state.connection;
 
 export default connectionSlice.reducer;
