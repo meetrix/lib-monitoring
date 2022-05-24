@@ -1,16 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../store/store';
 
-export interface IAudioState {
-  status: string;
-  subMessages: string[];
+import { RootState } from '../../store/store';
+import { ISubMessages, ISubStatus, ITestState } from '../types';
+
+export interface IAudioSubMessages extends ISubMessages {
+  default: string[];
+}
+
+export interface IAudioSubStatus extends ISubStatus {
+  default: string;
+}
+
+export interface IAudioTestState extends ITestState {
+  status: '' | 'running' | 'success' | 'failure';
+  subMessages: IAudioSubMessages;
+  subStatus: IAudioSubStatus;
   error: string;
 }
 
-const initialState: IAudioState = {
+const initialState: IAudioTestState = {
   status: '',
-  subMessages: ['[ INFO ] Test not run yet.'],
-  error: ''
+  subMessages: { default: ['[ INFO ] Test not run yet.'] },
+  subStatus: { default: '' },
+  error: '',
 };
 
 export const audioSlice = createSlice({
@@ -18,20 +30,20 @@ export const audioSlice = createSlice({
   initialState,
   reducers: {
     addSubMessage(state, action) {
-      state.subMessages.push(action.payload);
+      state.subMessages.default.push(action.payload);
     },
     startTest(state, action) {
-      state.subMessages = [];
+      state.subMessages.default = [];
       state.status = 'running';
     },
     endTest(state, action) {
       state.status = action.payload;
-    }
-  }
+    },
+  },
 });
 
 export const { actions: audioActions } = audioSlice;
 
-export const selectAudio = (state: RootState): IAudioState => state.audio;
+export const selectAudio = (state: RootState): IAudioTestState => state.audio;
 
 export default audioSlice.reducer;
