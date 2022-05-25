@@ -78,7 +78,7 @@ const useStatus = () => {
     overallNetworkStatus = 'running';
   }
 
-  let overallNetworkError = [networkStatus.error, connectionStatus.error, bandwidthStatus.error]
+  let overallNetworkError = [networkStatus.message, connectionStatus.message, bandwidthStatus.message]
     .filter(Boolean)
     .join(', ');
   let overallSubMessages = {
@@ -97,7 +97,7 @@ const useStatus = () => {
       key: 'browser',
       label: 'Checking your browser',
       status: browserStatus.status,
-      message: browserStatus.error,
+      message: browserStatus.message,
       subMessages: browserStatus.subMessages,
       subStatus: browserStatus.subStatus,
     },
@@ -105,7 +105,7 @@ const useStatus = () => {
       key: 'microphone',
       label: 'Checking your microphone',
       status: audioStatus.status,
-      message: audioStatus.error,
+      message: audioStatus.message,
       subMessages: audioStatus.subMessages,
       subStatus: {},
     },
@@ -113,7 +113,7 @@ const useStatus = () => {
       key: 'camera',
       label: 'Checking your camera',
       status: videoStatus.status,
-      message: videoStatus.error,
+      message: videoStatus.message,
       subMessages: videoStatus.subMessages,
       subStatus: videoStatus.subStatus,
     },

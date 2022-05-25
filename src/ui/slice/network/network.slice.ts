@@ -18,11 +18,12 @@ export interface INetworkTestState extends ITestState {
   status: '' | 'running' | 'success' | 'failure';
   subMessages: INetworkSubMessages;
   subStatus: INetworkSubStatus;
-  error: string;
+  message: string;
 }
 
 const initialState: INetworkTestState = {
   status: '',
+  subOrder: ['udp', 'tcp', 'ipv6'],
   subMessages: {
     udp: ['[ INFO ] Test not run yet.'],
     tcp: ['[ INFO ] Test not run yet.'],
@@ -33,7 +34,7 @@ const initialState: INetworkTestState = {
     tcp: '',
     ipv6: '',
   },
-  error: '',
+  message: '',
 };
 
 export const networkSlice = createSlice({

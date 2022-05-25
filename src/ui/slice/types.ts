@@ -8,7 +8,8 @@ export interface ISubStatus {
 
 export interface ITestState {
   status: '' | 'running' | 'success' | 'failure';
+  subOrder: string[];
   subMessages: ISubMessages;
   subStatus: ISubStatus;
-  error: string;
+  message: string;
 }

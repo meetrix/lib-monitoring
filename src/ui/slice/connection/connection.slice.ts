@@ -18,11 +18,12 @@ export interface IConnectionTestState extends ITestState {
   status: '' | 'running' | 'success' | 'failure';
   subMessages: IConnectionSubMessages;
   subStatus: IConnectionSubStatus;
-  error: string;
+  message: string;
 }
 
 const initialState: IConnectionTestState = {
   status: '',
+  subOrder: ['relay', 'reflexive', 'host'],
   subMessages: {
     relay: ['[ INFO ] Test not run yet.'],
     reflexive: ['[ INFO ] Test not run yet.'],
@@ -33,7 +34,7 @@ const initialState: IConnectionTestState = {
     reflexive: '',
     host: '',
   },
-  error: '',
+  message: '',
 };
 
 export const connectionSlice = createSlice({

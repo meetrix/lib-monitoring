@@ -16,11 +16,12 @@ export interface IBandwidthTestState extends ITestState {
   status: '' | 'running' | 'success' | 'failure';
   subMessages: IBandwidthSubMessages;
   subStatus: IBandwidthSubStatus;
-  error: string;
+  message: string;
 }
 
 const initialState: IBandwidthTestState = {
   status: '',
+  subOrder: ['throughput', 'bandwidth'],
   subMessages: {
     throughput: ['[ INFO ] Test not run yet.'],
     videoBandwidth: ['[ INFO ] Test not run yet.'],
@@ -29,7 +30,7 @@ const initialState: IBandwidthTestState = {
     throughput: '',
     videoBandwidth: '',
   },
-  error: '',
+  message: '',
 };
 
 export const bandwidthSlice = createSlice({

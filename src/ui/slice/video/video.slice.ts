@@ -20,11 +20,12 @@ export interface IVideoTestState extends ITestState {
   status: '' | 'running' | 'success' | 'failure';
   subMessages: IVideoSubMessages;
   subStatus: IVideoSubStatus;
-  error: string;
+  message: string;
 }
 
 const initialState: IVideoTestState = {
   status: '',
+  subOrder: ['p240', 'p480', 'p720', 'generic'],
   subMessages: {
     p240: ['[ INFO ] Test not run yet.'],
     p480: ['[ INFO ] Test not run yet.'],
@@ -37,7 +38,7 @@ const initialState: IVideoTestState = {
     p720: '',
     generic: '',
   },
-  error: '',
+  message: '',
 };
 
 export const videoSlice = createSlice({

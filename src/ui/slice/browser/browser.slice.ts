@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { RootState } from '../../store/store';
-import { ISubMessages, ISubStatus } from '../types';
+import { ISubMessages, ISubStatus, ITestState } from '../types';
 
 export interface IBrowserSubMessages extends ISubMessages {
   default: string[];
@@ -11,22 +11,23 @@ export interface IBrowserSubStatus extends ISubStatus {
   default: string;
 }
 
-export interface IBrowserTestState {
-  status: string;
+export interface IBrowserTestState extends ITestState {
+  status: '' | 'running' | 'success' | 'failure';
   subMessages: IBrowserSubMessages;
   subStatus: IBrowserSubStatus;
-  error: string;
+  message: string;
 }
 
 const initialState: IBrowserTestState = {
   status: '',
+  subOrder: ['default'],
   subMessages: {
     default: ['[ INFO ] Test not run yet.'],
   },
   subStatus: {
     default: '',
   },
-  error: '',
+  message: '',
 };
 
 export const browserSlice = createSlice({

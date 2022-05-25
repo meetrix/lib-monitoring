@@ -15,14 +15,15 @@ export interface IAudioTestState extends ITestState {
   status: '' | 'running' | 'success' | 'failure';
   subMessages: IAudioSubMessages;
   subStatus: IAudioSubStatus;
-  error: string;
+  message: string;
 }
 
 const initialState: IAudioTestState = {
   status: '',
+  subOrder: ['default'],
   subMessages: { default: ['[ INFO ] Test not run yet.'] },
   subStatus: { default: '' },
-  error: '',
+  message: '',
 };
 
 export const audioSlice = createSlice({
