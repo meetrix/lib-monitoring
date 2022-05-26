@@ -9,6 +9,8 @@ describe('FakeStateGenerator', () => {
     });
 
     expect(state).toEqual({
+      key: 'camera',
+      label: 'Checking your camera',
       status: 'running',
       subOrder: ['p240', 'p480', 'p720', 'generic'],
       subMessages: {

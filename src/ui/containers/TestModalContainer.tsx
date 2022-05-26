@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import getUrlParams from '../../utils/urlUtils';
 import TestModal from '../components/TestModal';
 import { useAppDispatch } from '../store/hooks';
-
 import { browserActions, selectBrowser } from '../slice/browser/browser.slice';
 import { audioActions, selectAudio } from '../slice/audio/audio.slice';
 import { videoActions, selectVideo } from '../slice/video/video.slice';
@@ -13,41 +12,8 @@ import { connectionActions, selectConnection } from '../slice/connection/connect
 import { bandwidthActions, selectBandwidth } from '../slice/bandwidth/bandwidth.slice';
 import { TestEvent, TestEventCallback } from '../../utils/webrtctests/TestEvent';
 import { testBrowser, testCamera, testMicrophone, testNetwork } from '../../utils/webrtctests';
-
-export const sampleData = [
-  {
-    key: 'browser',
-    label: 'Checking your browser',
-    status: 'failure',
-    message: 'Your browser is not compatible',
-    subMessages: {},
-    subStatus: {},
-  },
-  {
-    key: 'microphone',
-    label: 'Checking your microphone',
-    status: 'success',
-    message: 'No issues found',
-    subMessages: {},
-    subStatus: {},
-  },
-  {
-    key: 'camera',
-    label: 'Checking your camera',
-    status: 'running',
-    message: '',
-    subMessages: {},
-    subStatus: {},
-  },
-  {
-    key: 'network',
-    label: 'Checking your network connection',
-    status: '',
-    message: '',
-    subMessages: {},
-    subStatus: {},
-  },
-];
+import { generateFakeState } from '../../utils/webrtctests/fakeStateGenerator';
+import { components, ITestView, subComponents } from '../slice/types';
 
 const useStatus = () => {
   const browserStatus = useSelector(selectBrowser);
@@ -58,27 +24,24 @@ const useStatus = () => {
   const bandwidthStatus = useSelector(selectBandwidth);
 
   let overallNetworkStatus = '';
-  if (
-    [networkStatus.status, connectionStatus.status, bandwidthStatus.status].every(
-      status => status === 'success',
-    )
-  ) {
+  const subNetworkStatuses = [
+    networkStatus.status,
+    connectionStatus.status,
+    bandwidthStatus.status,
+  ];
+  if (subNetworkStatuses.every(status => status === 'success')) {
     overallNetworkStatus = 'success';
-  } else if (
-    [networkStatus.status, connectionStatus.status, bandwidthStatus.status].some(
-      status => status === 'failure',
-    )
-  ) {
+  } else if (subNetworkStatuses.some(status => status === 'failure')) {
     overallNetworkStatus = 'failure';
-  } else if (
-    [networkStatus.status, connectionStatus.status, bandwidthStatus.status].some(
-      status => status === 'running',
-    )
-  ) {
+  } else if (subNetworkStatuses.some(status => status === 'running')) {
     overallNetworkStatus = 'running';
   }
 
-  let overallNetworkError = [networkStatus.message, connectionStatus.message, bandwidthStatus.message]
+  let overallNetworkError = [
+    networkStatus.message,
+    connectionStatus.message,
+    bandwidthStatus.message,
+  ]
     .filter(Boolean)
     .join(', ');
   let overallSubMessages = {
@@ -94,38 +57,30 @@ const useStatus = () => {
 
   return [
     {
-      key: 'browser',
+      key: components[0],
       label: 'Checking your browser',
-      status: browserStatus.status,
-      message: browserStatus.message,
-      subMessages: browserStatus.subMessages,
-      subStatus: browserStatus.subStatus,
+      ...browserStatus,
     },
     {
-      key: 'microphone',
+      key: components[1],
       label: 'Checking your microphone',
-      status: audioStatus.status,
-      message: audioStatus.message,
-      subMessages: audioStatus.subMessages,
-      subStatus: {},
+      ...audioStatus,
     },
     {
-      key: 'camera',
+      key: components[2],
       label: 'Checking your camera',
-      status: videoStatus.status,
-      message: videoStatus.message,
-      subMessages: videoStatus.subMessages,
-      subStatus: videoStatus.subStatus,
+      ...videoStatus,
     },
     {
-      key: 'network',
+      key: components[3],
+      subOrder: [...subComponents[components[3]]],
       label: 'Checking your network connection',
       status: overallNetworkStatus,
       message: overallNetworkError,
       subMessages: overallSubMessages,
       subStatus: overallSubStatus,
     },
-  ];
+  ] as ITestView[];
 };
 
 export interface ITestModalContainerProps {
@@ -183,12 +138,18 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
     });
   };
 
+  const sampleData = generateFakeState({
+    component: 'camera',
+    status: 'running',
+    subComponent: 'p720',
+  });
+
   return (
     <TestModal
       open={open}
       onClose={onClose}
       onRetry={handleStart}
-      data={mockStats ? sampleData : status}
+      data={mockStats ? [{ ...sampleData }] : status}
     />
   );
 };

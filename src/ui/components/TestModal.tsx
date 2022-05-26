@@ -11,7 +11,9 @@ import {
 } from '@mui/material';
 import { withStyles, createStyles, WithStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
+
 import TestListRow from './TestListRow';
+import { ITestView } from '../slice/types';
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -38,24 +40,15 @@ const styles = (theme: Theme) => {
   });
 };
 
-export interface ITestResultData {
-  key: string;
-  label: string;
-  status: string;
-  message: string;
-  subMessages: { [x: string]: string };
-  subStatus: { [x: string]: string };
-}
-
 export interface TestModalProps extends WithStyles<ButtonProps & typeof styles> {
   label?: string;
   open: boolean;
-  data: ITestResultData[];
+  data: ITestView[];
   onClose?: () => void;
   onRetry?: () => void;
 }
 
-function deriveStatus(data: ITestResultData[]) {
+function deriveStatus(data: ITestView[]) {
   const status = data.every(({ status }) => status === '')
     ? ''
     : data.every(({ status }) => status === 'success')

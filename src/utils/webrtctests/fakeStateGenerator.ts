@@ -1,22 +1,11 @@
-import { ISubMessages, ISubStatus, ITestState } from '../../ui/slice/types';
-
-const statuses = ['', 'success', 'failure', 'running'] as const;
-const components = ['browser', 'microphone', 'camera', 'network'] as const;
-const subComponents = {
-  browser: ['default'],
-  microphone: ['default'],
-  camera: ['p240', 'p480', 'p720', 'generic'],
-  network: [
-    'connection-relay',
-    'connection-reflexive',
-    'connection-host',
-    'network-udp',
-    'network-tcp',
-    'network-ipv6',
-    'bandwidth-throughput',
-    'bandwidth-bandwidth',
-  ],
-} as const;
+import {
+  components,
+  ISubMessages,
+  ISubStatus,
+  ITestView,
+  statuses,
+  subComponents,
+} from '../../ui/slice/types';
 
 interface IFakeStateParams {
   status: typeof statuses[number];
@@ -69,7 +58,7 @@ export function generateFakeState({
   component,
   status,
   subComponent,
-}: IFakeStateParams): ITestState {
+}: IFakeStateParams): ITestView {
   const numStages = subComponents[component].length;
   const subMessagesX: ISubMessages = {};
   const subStatusX: ISubStatus = {};
@@ -88,5 +77,7 @@ export function generateFakeState({
     subMessages: subMessagesX,
     subStatus: subStatusX,
     message: generateFakeMessage({ component, status, subComponent }),
+    key: component,
+    label: `Checking your ${component}`,
   };
 }
