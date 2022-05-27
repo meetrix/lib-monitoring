@@ -1,23 +1,33 @@
 // import qs from 'qs'
 
 export interface URLParametersType {
-  token?: string | undefined
-  mockStats?: boolean
-  clientId?: string | undefined
+  token?: string | undefined;
+  mockStats?: boolean;
+  mockArgs?: { [key: string]: string };
+  clientId?: string | undefined;
 }
 
 // TODO: `qs` throws this error -> util is undefined. Needs fixing. Mocking for now
 
-export const getUrlParams = (urlParams?: string, options?: any): URLParametersType => {
-  const parameters = urlParams || window?.location?.search
-  const regexp = parameters.match(/([^?=&]+)(=([^&]*))/g)
-  if (!regexp || !parameters.match(/\?/g)) {
-    return {}
-  }
-  const { token, mockStats, clientId }: URLParametersType = regexp.reduce((a: any, v: string) => {
-    return (a[v.slice(0, v.indexOf('='))] = v.slice(v.indexOf('=') + 1)), a
-  }, {})
+const splitByComma = (str?: string) =>
+  str?.split(',')?.reduce((acc, curr) => {
+    const [key, value] = curr.split('=');
+    acc[key] = value;
+    return acc;
+  }, {} as { [key: string]: string });
 
-  return { token, mockStats: !!mockStats, clientId }
-}
-export default getUrlParams
+export const getUrlParams = (
+  paramsStr: string = window?.location?.search,
+  options?: any,
+): URLParametersType => {
+  const searchParams = new URLSearchParams(paramsStr);
+
+  return {
+    token: searchParams.get('token') || undefined,
+    mockStats: searchParams.get('mockStats') === 'true',
+    mockArgs: splitByComma(searchParams.get('mockArgs') || undefined),
+    clientId: searchParams.get('clientId') || undefined,
+  };
+};
+
+export default getUrlParams;

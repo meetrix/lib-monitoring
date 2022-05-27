@@ -39,6 +39,7 @@ export const audioSlice = createSlice({
     },
     endTest(state, action) {
       state.status = action.payload;
+      state.message = action.payload;
     },
   },
 });

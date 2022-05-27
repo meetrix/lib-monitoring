@@ -2,8 +2,7 @@ import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
 import TestModal from '../ui/components/TestModal';
-import { ITestView } from '../ui/slice/types';
-import { generateFakeState } from '../utils/webrtctests/fakeStateGenerator';
+import { generateFakeStateList } from '../utils/webrtctests/fakeStateGenerator';
 
 export default {
   title: 'Example/TestModal',
@@ -16,28 +15,11 @@ export default {
   },
 } as ComponentMeta<typeof TestModal>;
 
-const sampleData = [
-  generateFakeState({
-    component: 'browser',
-    status: 'success',
-    subComponent: 'default',
-  }),
-  generateFakeState({
-    component: 'microphone',
-    status: 'success',
-    subComponent: 'default',
-  }),
-  generateFakeState({
-    component: 'camera',
-    status: 'success',
-    subComponent: 'default',
-  }),
-  generateFakeState({
-    component: 'network',
-    status: 'failure',
-    subComponent: 'bandwidth-throughput',
-  }),
-] as ITestView[];
+const sampleData = generateFakeStateList({
+  component: 'network',
+  status: 'failure',
+  subComponent: 'connection-reflexive',
+});
 
 const Template: ComponentStory<typeof TestModal> = args => <TestModal {...args} />;
 

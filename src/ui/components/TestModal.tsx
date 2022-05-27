@@ -84,7 +84,7 @@ export const TestModal: React.FC<TestModalProps> = ({
   onRetry: handleRetry,
   ...otherProps
 }: TestModalProps) => {
-  var { status, statusMessage } = deriveStatus(data);
+  const { status, statusMessage } = deriveStatus(data);
 
   useEffect(() => {
     if (open && status === '') {

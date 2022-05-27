@@ -81,3 +81,17 @@ export function generateFakeState({
     label: `Checking your ${component}`,
   };
 }
+
+export function generateFakeStateList(params: IFakeStateParams): ITestView[] {
+  const output: ITestView[] = [];
+  const lastRunComponentIndex = components.indexOf(params.component);
+  for (let i = 0; i < components.length; i++) {
+    const component = components[i];
+    const status =
+      lastRunComponentIndex === i ? params.status : i < lastRunComponentIndex ? 'success' : '';
+    const subComponent = subComponents[component][subComponents[component].length - 1];
+    output.push(generateFakeState({ component, status, subComponent }));
+  }
+
+  return output;
+}

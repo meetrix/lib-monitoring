@@ -12,8 +12,8 @@ import { connectionActions, selectConnection } from '../slice/connection/connect
 import { bandwidthActions, selectBandwidth } from '../slice/bandwidth/bandwidth.slice';
 import { TestEvent, TestEventCallback } from '../../utils/webrtctests/TestEvent';
 import { testBrowser, testCamera, testMicrophone, testNetwork } from '../../utils/webrtctests';
-import { generateFakeState } from '../../utils/webrtctests/fakeStateGenerator';
-import { components, ITestView, subComponents } from '../slice/types';
+import { generateFakeStateList } from '../../utils/webrtctests/fakeStateGenerator';
+import { components, ITestView, statuses, subComponents } from '../slice/types';
 
 const useStatus = () => {
   const browserStatus = useSelector(selectBrowser);
@@ -37,19 +37,19 @@ const useStatus = () => {
     overallNetworkStatus = 'running';
   }
 
-  let overallNetworkError = [
+  const overallNetworkError = [
     networkStatus.message,
     connectionStatus.message,
     bandwidthStatus.message,
   ]
     .filter(Boolean)
     .join(', ');
-  let overallSubMessages = {
+  const overallSubMessages = {
     network: networkStatus.subMessages,
     connection: connectionStatus.subMessages,
     bandwidth: bandwidthStatus.subMessages,
   };
-  let overallSubStatus = {
+  const overallSubStatus = {
     network: networkStatus.subStatus,
     connection: connectionStatus.subStatus,
     bandwidth: bandwidthStatus.subStatus,
@@ -96,7 +96,7 @@ type ActionsType =
   | typeof bandwidthActions;
 
 export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) => {
-  const { mockStats } = getUrlParams();
+  const { mockStats, mockArgs } = getUrlParams();
   const dispatch = useAppDispatch();
   const status = useStatus();
 
@@ -138,18 +138,29 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
     });
   };
 
-  const sampleData = generateFakeState({
-    component: 'camera',
-    status: 'running',
-    subComponent: 'p720',
+  // Accepts state of the last running component; all previous ones set to pass
+  // e.g.: http://localhost:8080/?mockStats=true&mockArgs=component=camera,status=running
+  const componentArg = ((components.includes(mockArgs?.component as any) && mockArgs?.component) ||
+    'network') as typeof components[number];
+  const statusArg = ((statuses.includes(mockArgs?.status as any) && mockArgs?.status) ||
+    'failure') as typeof statuses[number];
+  const subComponentArg = (([...subComponents[componentArg]].includes(
+    mockArgs?.subComponent as any,
+  ) &&
+    mockArgs?.subComponent) ||
+    'connection-reflexive') as typeof subComponents[typeof components[number]][number];
+  const sampleData = generateFakeStateList({
+    component: componentArg,
+    status: statusArg,
+    subComponent: subComponentArg,
   });
 
   return (
     <TestModal
       open={open}
       onClose={onClose}
-      onRetry={handleStart}
-      data={mockStats ? [{ ...sampleData }] : status}
+      onRetry={mockStats ? () => {} : handleStart}
+      data={mockStats ? sampleData : status}
     />
   );
 };
