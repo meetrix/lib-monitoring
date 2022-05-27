@@ -13,7 +13,7 @@ import { withStyles, createStyles, WithStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
 
 import TestListRow from './TestListRow';
-import { ITestView } from '../slice/types';
+import { ITestView, components, subComponents, ISubMessages } from '../slice/types';
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -75,6 +75,19 @@ function deriveStatus(data: ITestView[]) {
   return { status, statusMessage };
 }
 
+const getLastAvailableSubMessage = (row: ITestView) => {
+  const subComp = subComponents[row.key];
+  for (let i = subComp.length - 1; i >= 0; i--) {
+    const subComponent = subComp[i];
+    const subMessage = row?.subMessages[subComponent] && [...row.subMessages[subComponent]].pop();
+    if (subMessage) {
+      return subMessage;
+    }
+  }
+
+  return '';
+};
+
 export const TestModal: React.FC<TestModalProps> = ({
   classes,
   label,
@@ -116,7 +129,9 @@ export const TestModal: React.FC<TestModalProps> = ({
         </Typography>
         <div className={classes.listWrapper}>
           {data.map(row => {
-            return <TestListRow {...row} />;
+            return (
+              <TestListRow {...row} message={row.message || getLastAvailableSubMessage(row)} />
+            );
           })}
         </div>
         <Divider />
