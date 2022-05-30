@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button, ButtonProps, Theme, Typography } from '@mui/material';
+import { ButtonProps, Theme, Typography } from '@mui/material';
 import { withStyles, createStyles, WithStyles } from '@mui/styles';
-import { css } from '@emotion/css';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import DataSaverOffIcon from '@mui/icons-material/DataSaverOff';
@@ -20,14 +19,13 @@ const styles = (theme: Theme) => {
       '& .running': {
         '& .label-styles': {
           color: '#000',
-        }
+        },
       },
       '& .blackIcon': {
         '& .label-styles': {
           color: '#000',
-        }
+        },
       },
-      
     },
     rowInnerWrapper: {
       display: 'flex',
@@ -52,7 +50,7 @@ const styles = (theme: Theme) => {
       animation: `$icon-rotation 1s linear infinite`,
       color: '#00000040',
     },
-    "@keyframes icon-rotation": {
+    '@keyframes icon-rotation': {
       '0%': {
         transform: 'rotate(0)',
       },
@@ -63,41 +61,40 @@ const styles = (theme: Theme) => {
   });
 };
 
-export interface TestListRowProps
-  extends WithStyles<ButtonProps & typeof styles> {
+export interface TestListRowProps extends WithStyles<ButtonProps & typeof styles> {
   label?: string;
-  type?: 'success' | 'error' | 'unset' | 'running' | 'blackIcon' | string;
+  status?: 'success' | 'failure' | '' | 'running' | 'blackIcon' | string;
   message?: string;
 }
 
 export const TestListRow: React.FC<TestListRowProps> = ({
   classes,
   label,
-  type = 'unset',
+  status = '',
   message,
 }: TestListRowProps) => {
   const renderIcon = () => {
-    switch(type) {
+    switch (status) {
       case 'success':
-        return <CheckCircleIcon fontSize="small"/>
-      case 'error':
-        return <ErrorIcon fontSize="small" />
+        return <CheckCircleIcon fontSize="small" />;
+      case 'failure':
+        return <ErrorIcon fontSize="small" />;
       case 'running':
-        return <DataSaverOffIcon fontSize="small" className={classes.rotatingEffect} />
-      case 'blackIcon':
-        return <ErrorIcon fontSize="small" />
+        return <DataSaverOffIcon fontSize="small" className={classes.rotatingEffect} />;
       default:
         return null;
     }
-  }
+  };
   return (
     <div className={classes.root}>
-      <div className={clsx(classes.applyFlex, `${type}`)}>
+      <div className={clsx(classes.applyFlex, `${status}`)}>
         <div className={classes.applyFlex}>
-        <div className={classes.icon}>{renderIcon()}</div>
-        <Typography variant="body2" className={clsx(classes.label, 'label-styles')}>{label}</Typography>
-      </div>
-      {message && <Typography variant="body2">{message}</Typography>}
+          <div className={classes.icon}>{renderIcon()}</div>
+          <Typography variant="body2" className={clsx(classes.label, 'label-styles')}>
+            {label}
+          </Typography>
+        </div>
+        {message && <Typography variant="body2">{message}</Typography>}
       </div>
     </div>
   );

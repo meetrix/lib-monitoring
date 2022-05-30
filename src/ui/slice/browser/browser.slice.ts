@@ -1,41 +1,54 @@
-/* eslint-disable prefer-destructuring */
 import { createSlice } from '@reduxjs/toolkit';
+
 import { RootState } from '../../store/store';
+import { ISubMessages, ISubStatus, ITestState } from '../types';
 
-export interface ISubMessages {}
-export interface ISubStatus {}
-
-export interface IBrowserState {
-  status: string;
-  subMessages: ISubMessages;
-  subStatus: ISubStatus;
-  error: string;
+export interface IBrowserSubMessages extends ISubMessages {
+  default: string[];
 }
 
-const initialState: IBrowserState = {
+export interface IBrowserSubStatus extends ISubStatus {
+  default: string;
+}
+
+export interface IBrowserTestState extends ITestState {
+  status: '' | 'running' | 'success' | 'failure';
+  subMessages: IBrowserSubMessages;
+  subStatus: IBrowserSubStatus;
+  message: string;
+}
+
+const initialState: IBrowserTestState = {
   status: '',
-  subMessages: ['[ INFO ] Test not run yet.'],
-  subStatus: {},
-  error: ''
+  subOrder: ['default'],
+  subMessages: {
+    default: ['[ INFO ] Test not run yet.'],
+  },
+  subStatus: {
+    default: '',
+  },
+  message: '',
 };
 
 export const browserSlice = createSlice({
   name: 'browser',
   initialState,
   reducers: {
-    addSubMessage(state, action) {},
+    addSubMessage(state, action) {
+      state.subMessages.default.push(action.payload);
+    },
     startTest(state, action) {
-      state.subMessages = [];
+      state.subMessages.default = [];
       state.status = 'running';
     },
     endTest(state, action) {
       state.status = action.payload;
-    }
-  }
+    },
+  },
 });
 
 export const { actions: browserActions } = browserSlice;
 
-export const selectBrowser = (state: RootState): IBrowserState => state.browser;
+export const selectBrowser = (state: RootState): IBrowserTestState => state.browser;
 
 export default browserSlice.reducer;

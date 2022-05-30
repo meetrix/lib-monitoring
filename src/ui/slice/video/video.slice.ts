@@ -1,42 +1,44 @@
-/* eslint-disable prefer-destructuring */
 import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../store/store';
 
-export interface ISubMessages {
+import { RootState } from '../../store/store';
+import { ISubMessages, ISubStatus, ITestState } from '../types';
+
+export interface IVideoSubMessages extends ISubMessages {
   p240: string[];
   p480: string[];
   p720: string[];
   generic: string[];
 }
-export interface ISubStatus {
+export interface IVideoSubStatus extends ISubStatus {
   p240: string;
   p480: string;
   p720: string;
   generic: string;
 }
 
-export interface IVideoState {
-  status: string;
-  subMessages: ISubMessages;
-  subStatus: ISubStatus;
-  error: string;
+export interface IVideoTestState extends ITestState {
+  status: '' | 'running' | 'success' | 'failure';
+  subMessages: IVideoSubMessages;
+  subStatus: IVideoSubStatus;
+  message: string;
 }
 
-const initialState: IVideoState = {
+const initialState: IVideoTestState = {
   status: '',
+  subOrder: ['p240', 'p480', 'p720', 'generic'],
   subMessages: {
     p240: ['[ INFO ] Test not run yet.'],
     p480: ['[ INFO ] Test not run yet.'],
     p720: ['[ INFO ] Test not run yet.'],
-    generic: ['[ INFO ] Test not run yet.']
+    generic: ['[ INFO ] Test not run yet.'],
   },
   subStatus: {
     p240: '',
     p480: '',
     p720: '',
-    generic: ''
+    generic: '',
   },
-  error: ''
+  message: '',
 };
 
 export const videoSlice = createSlice({
@@ -105,12 +107,12 @@ export const videoSlice = createSlice({
         default:
           break;
       }
-    }
-  }
+    },
+  },
 });
 
 export const { actions: videoActions } = videoSlice;
 
-export const selectVideo = (state: RootState): IVideoState => state.video;
+export const selectVideo = (state: RootState): IVideoTestState => state.video;
 
 export default videoSlice.reducer;

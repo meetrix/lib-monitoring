@@ -1,34 +1,36 @@
-/* eslint-disable prefer-destructuring */
 import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../store/store';
 
-export interface ISubMessages {
+import { RootState } from '../../store/store';
+import { ISubMessages, ISubStatus, ITestState } from '../types';
+
+export interface IBandwidthSubMessages extends ISubMessages {
   throughput: string[];
   videoBandwidth: string[];
 }
-export interface ISubStatus {
+export interface IBandwidthSubStatus extends ISubStatus {
   throughput: string;
   videoBandwidth: string;
 }
 
-export interface IBandwidthState {
-  status: string;
-  subMessages: ISubMessages;
-  subStatus: ISubStatus;
-  error: string;
+export interface IBandwidthTestState extends ITestState {
+  status: '' | 'running' | 'success' | 'failure';
+  subMessages: IBandwidthSubMessages;
+  subStatus: IBandwidthSubStatus;
+  message: string;
 }
 
-const initialState: IBandwidthState = {
+const initialState: IBandwidthTestState = {
   status: '',
+  subOrder: ['throughput', 'bandwidth'],
   subMessages: {
     throughput: ['[ INFO ] Test not run yet.'],
-    videoBandwidth: ['[ INFO ] Test not run yet.']
+    videoBandwidth: ['[ INFO ] Test not run yet.'],
   },
   subStatus: {
     throughput: '',
-    videoBandwidth: ''
+    videoBandwidth: '',
   },
-  error: ''
+  message: '',
 };
 
 export const bandwidthSlice = createSlice({
@@ -77,12 +79,12 @@ export const bandwidthSlice = createSlice({
         default:
           break;
       }
-    }
-  }
+    },
+  },
 });
 
 export const { actions: bandwidthActions } = bandwidthSlice;
 
-export const selectBandwidth = (state: RootState): IBandwidthState => state.bandwidth;
+export const selectBandwidth = (state: RootState): IBandwidthTestState => state.bandwidth;
 
 export default bandwidthSlice.reducer;

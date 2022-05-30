@@ -1,38 +1,40 @@
-/* eslint-disable prefer-destructuring */
 import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../store/store';
 
-export interface ISubMessages {
+import { RootState } from '../../store/store';
+import { ISubMessages, ISubStatus, ITestState } from '../types';
+
+export interface INetworkSubMessages extends ISubMessages {
   udp: string[];
   tcp: string[];
   ipv6: string[];
 }
-export interface ISubStatus {
+export interface INetworkSubStatus extends ISubStatus {
   udp: string;
   tcp: string;
   ipv6: string;
 }
 
-export interface INetworkState {
-  status: string;
-  subMessages: ISubMessages;
-  subStatus: ISubStatus;
-  error: string;
+export interface INetworkTestState extends ITestState {
+  status: '' | 'running' | 'success' | 'failure';
+  subMessages: INetworkSubMessages;
+  subStatus: INetworkSubStatus;
+  message: string;
 }
 
-const initialState: INetworkState = {
+const initialState: INetworkTestState = {
   status: '',
+  subOrder: ['udp', 'tcp', 'ipv6'],
   subMessages: {
     udp: ['[ INFO ] Test not run yet.'],
     tcp: ['[ INFO ] Test not run yet.'],
-    ipv6: ['[ INFO ] Test not run yet.']
+    ipv6: ['[ INFO ] Test not run yet.'],
   },
   subStatus: {
     udp: '',
     tcp: '',
-    ipv6: ''
+    ipv6: '',
   },
-  error: ''
+  message: '',
 };
 
 export const networkSlice = createSlice({
@@ -91,12 +93,12 @@ export const networkSlice = createSlice({
         default:
           break;
       }
-    }
-  }
+    },
+  },
 });
 
 export const { actions: networkActions } = networkSlice;
 
-export const selectNetwork = (state: RootState): INetworkState => state.network;
+export const selectNetwork = (state: RootState): INetworkTestState => state.network;
 
 export default networkSlice.reducer;
