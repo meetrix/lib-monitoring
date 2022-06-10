@@ -13,10 +13,12 @@
       <button id="callButton">call</button>
       <button id="hangupButton">hangup</button>
 
+      <br>
+      <button id="troubleshooterButton" onclick="window.rtcMonitor.UI();">Start Troubleshooter</button>
+
       <script src="browser.js"></script>
       <script>
         window.rtcMonitor = new Monitor({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbHVnaW4iOnRydWUsImRvbWFpbiI6Im1lZXRyaXguaW8iLCJpYXQiOjE2NDA0OTQwMTAsImV4cCI6MTcyNjg5NDAxMCwic3ViIjoiNjFjNmYyNjZjNzU5MjAzMGRiYzViN2EwIn0.lF8zZMj--pOLslgpbP0LjC4FVotEOPQW-rN_2kucJCM' });
-        window.rtcMonitor.UI();
       </script>
 
       <script>
