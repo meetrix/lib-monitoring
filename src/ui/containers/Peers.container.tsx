@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { Button } from '@mui/material';
 
 import { TestModalContainer } from '../containers/TestModalContainer';
@@ -21,13 +21,11 @@ interface IPeers {}
 
 const PeersContainer: React.FC<IPeers> = ({}: IPeers) => {
   const [testModalOpen, setTestModalOpen] = React.useState(false);
-  
-  return (
-    <div>
-      <TestModalContainer open={testModalOpen} onClose={() => setTestModalOpen(false)} />
-      <Button onClick={() => setTestModalOpen(true)}>Start</Button>
-    </div>
-  );
+
+  useEffect(() => {
+    setTestModalOpen(true);
+  }, []);
+  return <TestModalContainer open={testModalOpen} onClose={() => setTestModalOpen(false)} />;
 };
 
 export default memo(PeersContainer);

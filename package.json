@@ -1,12 +1,10 @@
 {
-  "name": "@meetrix/lib-webrtc-monitoring",
+  "name": "@meetrix/lib-monitoring",
   "version": "0.0.1",
   "description": "",
   "keywords": [],
-  "main": "dist/lib-call-quality-monitoring.umd.js",
-  "module": "dist/lib-call-quality-monitoring.es5.js",
-  "browser": "dist/browser.js",
-  "typings": "dist/types/lib-call-quality-monitoring.d.ts",
+  "main": "./dist/lib/lib-call-quality-monitoring.js",
+  "browser": "./dist/browser.js",
   "files": [
     "dist"
   ],
@@ -38,7 +36,7 @@
     "generate-doc": "typedoc --out docs --theme minimal src",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "prepare": "husky install"
+    "prepare": "husky install && npm run build"
   },
   "lint-staged": {
     "{src,test}/**/*.{ts,js}": [
