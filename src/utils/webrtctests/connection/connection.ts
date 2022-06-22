@@ -26,7 +26,7 @@ let iceCandidateFilter: any;
 const initConnectionTest = async (
   callback: TestEventCallback,
   iceCandidateFilterArg: any,
-  typeArg: string
+  typeArg: string,
 ) => {
   type = typeArg;
   report = callback;
@@ -37,7 +37,7 @@ const initConnectionTest = async (
 
 const runConnectionTest = async () => {
   debug('runConnectionTest()');
-  const config = asyncCreateTurnConfig();
+  const config = await asyncCreateTurnConfig();
   return start(config);
 };
 
@@ -56,7 +56,7 @@ const start = async (config: RTCConfiguration) => {
       if (iceCandidateFilter(parsedCandidate)) {
         report(TestEvent.MESSAGE, [
           type,
-          `[ INFO ] Gathered candidate of Type: ${parsedCandidate.type} Protocol: ${parsedCandidate.protocol} Address: ${parsedCandidate.address}`
+          `[ INFO ] Gathered candidate of Type: ${parsedCandidate.type} Protocol: ${parsedCandidate.protocol} Address: ${parsedCandidate.address}`,
         ]);
       }
     }
@@ -112,7 +112,7 @@ const hangup = async (errorMessage: string) => {
     ) {
       report(TestEvent.MESSAGE, [
         type,
-        '[ WARN ] Could not connect using reflexive candidates, likely due to the network environment/configuration.'
+        '[ WARN ] Could not connect using reflexive candidates, likely due to the network environment/configuration.',
       ]);
     } else {
       report(TestEvent.MESSAGE, [type, `[ FAILED ] ${errorMessage}`]);

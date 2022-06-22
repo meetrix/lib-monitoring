@@ -2,8 +2,17 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import axios from 'axios';
 import Debug from 'debug';
+import { get, memoize } from 'lodash';
+
 import { stun, turn } from '../config';
+import API from './API';
+
+let api: API;
+export const setAPI = (apiInstance: API) => {
+  api = apiInstance;
+};
 
 const debug = Debug('utils');
 
@@ -58,7 +67,7 @@ export const enumerateStats = (stats: any, localTrackIds: any, remoteTrackIds: a
         payloadType: 0,
         timestamp: 0.0,
         trackId: '',
-        transportId: ''
+        transportId: '',
       },
       remote: {
         audioLevel: 0.0,
@@ -73,8 +82,8 @@ export const enumerateStats = (stats: any, localTrackIds: any, remoteTrackIds: a
         payloadType: 0,
         timestamp: 0.0,
         trackId: '',
-        transportId: ''
-      }
+        transportId: '',
+      },
     },
     video: {
       local: {
@@ -94,7 +103,7 @@ export const enumerateStats = (stats: any, localTrackIds: any, remoteTrackIds: a
         qpSum: 0,
         timestamp: 0.0,
         trackId: '',
-        transportId: ''
+        transportId: '',
       },
       remote: {
         bytesReceived: -1,
@@ -116,8 +125,8 @@ export const enumerateStats = (stats: any, localTrackIds: any, remoteTrackIds: a
         qpSum: 0,
         timestamp: 0.0,
         trackId: '',
-        transportId: ''
-      }
+        transportId: '',
+      },
     },
     connection: {
       availableOutgoingBitrate: 0,
@@ -144,8 +153,8 @@ export const enumerateStats = (stats: any, localTrackIds: any, remoteTrackIds: a
       responsesReceived: 0,
       responsesSent: 0,
       timestamp: 0.0,
-      totalRoundTripTime: 0.0
-    }
+      totalRoundTripTime: 0.0,
+    },
   };
 
   // Need to find the codec, local and remote ID's first.
@@ -414,7 +423,7 @@ export const setTimeoutWithProgressBar = (timeoutMs: number): Promise<void> => {
 export const asyncCreateStunConfig = (): RTCConfiguration => {
   // if (typeof settings.stunURI === 'string' && settings.stunURI !== '') {
   const iceServer = {
-    urls: stun.uri.split(',')
+    urls: stun.uri.split(','),
   };
   const config = { iceServers: [iceServer] };
   // report.traceEventInstant('stun-config', config);
@@ -431,12 +440,12 @@ export const asyncCreateStunConfig = (): RTCConfiguration => {
 };
 
 // Get a TURN config, either from settings or from network traversal server.
-export const asyncCreateTurnConfig = (): RTCConfiguration => {
+export const asyncCreateTurnConfigDefault = (): RTCConfiguration => {
   // if (typeof settings.turnURI === 'string' && settings.turnURI !== '') {
   const iceServer = {
     username: turn.username || '',
     credential: turn.credential || '',
-    urls: turn.uri.split(',')
+    urls: turn.uri.split(','),
   };
   const config = { iceServers: [iceServer] };
   // report.traceEventInstant('turn-config', config);
@@ -451,6 +460,20 @@ export const asyncCreateTurnConfig = (): RTCConfiguration => {
   //   }, onError);
   // }
 };
+
+export const asyncCreateTurnConfig = memoize(
+  async (): Promise<RTCConfiguration> => {
+    const iceServersConfig = (await api.rest?.get('/plugins/ice-servers'))?.data?.data;
+
+    if (iceServersConfig) {
+      return iceServersConfig;
+    }
+
+    return asyncCreateTurnConfigDefault();
+  },
+  // Cache only for a minute
+  () => Math.ceil(Date.now() / 1000 / 60),
+);
 
 export const doGetUserMedia = async (constraints: MediaStreamConstraints): Promise<MediaStream> => {
   // const traceGumEvent = report.traceEventAsync('getusermedia');
@@ -468,11 +491,11 @@ export const doGetUserMedia = async (constraints: MediaStreamConstraints): Promi
       //   const mic = self.getDeviceName_(stream.getAudioTracks());
       // traceGumEvent({ status: 'success', camera: cam, microphone: mic });
       resolve(stream);
-    } catch (e: any) {
+    } catch (e) {
       debug(e);
       reject(e);
       // traceGumEvent({ status: 'exception', error: e.message });
-      debug(`getUserMedia failed with exception: ${e.message}`);
+      debug(`getUserMedia failed with exception: ${(e as Error).message}`);
     }
   });
 };

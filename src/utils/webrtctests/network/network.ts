@@ -26,7 +26,7 @@ const initNetworkTest = async (
   callback: TestEventCallback,
   protocolArg: string,
   paramsArg: any,
-  typeArg: string
+  typeArg: string,
 ): Promise<boolean> => {
   type = typeArg;
   report = callback;
@@ -43,7 +43,7 @@ const runNetworkTest = async (): Promise<boolean> => {
   if (type === 'ipv6') {
     return gatherCandidates({});
   } else {
-    let config = asyncCreateTurnConfig();
+    let config = await asyncCreateTurnConfig();
     config = filterConfig(config);
     return gatherCandidates(config);
   }
@@ -100,7 +100,7 @@ const gatherCandidates = async (config: any): Promise<boolean> => {
       report(TestEvent.MESSAGE, [
         type,
         '[ WARN ] Failed to create peer connection, IPv6 ' +
-          'might not be setup/supported on the network.'
+          'might not be setup/supported on the network.',
       ]);
     } else {
       report(TestEvent.MESSAGE, [type, `[ FAILED ] Failed to create peer connection: ${error}`]);
@@ -125,7 +125,7 @@ const gatherCandidates = async (config: any): Promise<boolean> => {
         if (iceCandidateFilterFunction(parsed)) {
           report(TestEvent.MESSAGE, [
             type,
-            `[ OK ] Gathered candidate of Type: ${parsed.type} Protocol: ${parsed.protocol} Address: ${parsed.address}`
+            `[ OK ] Gathered candidate of Type: ${parsed.type} Protocol: ${parsed.protocol} Address: ${parsed.address}`,
           ]);
           pc.close();
           // = null;
@@ -141,7 +141,7 @@ const gatherCandidates = async (config: any): Promise<boolean> => {
           report(TestEvent.MESSAGE, [
             type,
             '[ WARN ] Failed to gather IPv6 candidates, it ' +
-              'might not be setup/supported on the network.'
+              'might not be setup/supported on the network.',
           ]);
         } else {
           report(TestEvent.MESSAGE, [type, '[ FAILED ] Failed to gather specified candidates']);
