@@ -50,7 +50,8 @@ const config = {
     static: {
       directory: './dist'
     },
-    hot: true
+    hot: true,
+    server: 'https',
   },
   devtool: 'source-map',
   plugins: [

@@ -14,7 +14,8 @@
     "emitDecoratorMetadata": true,
     "outDir": "dist/lib",
     "typeRoots": ["node_modules/@types"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "downlevelIteration": true
   },
   "include": ["src"]
 }

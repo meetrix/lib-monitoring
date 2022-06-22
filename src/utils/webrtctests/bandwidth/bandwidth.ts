@@ -47,7 +47,7 @@ const initBandwidthTestThroughput = async (callback: TestEventCallback) => {
   debug('initBandwidthTestThroughput()');
   report = callback;
   report(TestEvent.START, 'throughput');
-  const config = asyncCreateTurnConfig();
+  const config = await asyncCreateTurnConfig();
   await runBandwidthTestThroughput(config);
 };
 
@@ -55,7 +55,7 @@ const initBandwidthTestVideoBandwidth = async (callback: TestEventCallback) => {
   debug('initBandwidthTestVideoBandwidth()');
   report = callback;
   report(TestEvent.START, 'videoBandwidth');
-  const config = asyncCreateTurnConfig();
+  const config = await asyncCreateTurnConfig();
   await runBandwidthTestVideoBandwidth(config);
 };
 
@@ -125,7 +125,7 @@ const onMessageReceived = async (event: MessageEvent) => {
     const receivedKBits = (receivedPayloadBytes * 8) / 1000;
     report(TestEvent.MESSAGE, [
       'throughput',
-      `[ OK ] Total transmitted: ${receivedKBits} kilo-bits in ${elapsedTime} seconds.`
+      `[ OK ] Total transmitted: ${receivedKBits} kilo-bits in ${elapsedTime} seconds.`,
     ]);
     report(TestEvent.END, ['throughput', 'success']);
   }
@@ -159,8 +159,8 @@ const constraints = {
   audio: false,
   video: {
     width: { exact: 1280 },
-    height: { exact: 720 }
-  }
+    height: { exact: 720 },
+  },
 };
 
 const runBandwidthTestVideoBandwidth = async (config: RTCConfiguration) => {
@@ -215,11 +215,11 @@ const gotStats = (response: any, time: any, response2: any, time2: any) => {
       if (typeof response[i].connection !== 'undefined') {
         bweStats.add(
           response[i].connection.timestamp,
-          parseInt(response[i].connection.availableOutgoingBitrate, 10)
+          parseInt(response[i].connection.availableOutgoingBitrate, 10),
         );
         rttStats.add(
           response[i].connection.timestamp,
-          response[i].connection.currentRoundTripTime * 1000
+          response[i].connection.currentRoundTripTime * 1000,
         );
         // Grab the last stats.
         videoStats[0] = response[i].video.local.frameWidth;
@@ -253,7 +253,7 @@ const gotStats = (response: any, time: any, response2: any, time2: any) => {
   } else {
     report(TestEvent.MESSAGE, [
       'videoBandwidth',
-      `[ FAILED ] Only Firefox and Chrome getStats implementations are supported.`
+      `[ FAILED ] Only Firefox and Chrome getStats implementations are supported.`,
     ]);
   }
 
@@ -265,35 +265,37 @@ const gotStats = (response: any, time: any, response2: any, time2: any) => {
     if (videoStats[0] < 2 && videoStats[1] < 2) {
       report(TestEvent.MESSAGE, [
         'videoBandwidth',
-        `[ FAILED ] Camera failure: ${videoStats[0]}x${videoStats[1]}. Cannot test bandwidth without a working camera.`
+        `[ FAILED ] Camera failure: ${videoStats[0]}x${videoStats[1]}. Cannot test bandwidth without a working camera.`,
       ]);
     } else {
       report(TestEvent.MESSAGE, [
         'videoBandwidth',
-        `[ OK ] Video resolution: ${videoStats[0]}x${videoStats[1]}`
+        `[ OK ] Video resolution: ${videoStats[0]}x${videoStats[1]}`,
       ]);
       report(TestEvent.MESSAGE, [
         'videoBandwidth',
-        `[ INFO ] Send bandwidth estimate average: ${Math.round(bweStats.getAverage() / 1000)} kbps`
+        `[ INFO ] Send bandwidth estimate average: ${Math.round(
+          bweStats.getAverage() / 1000,
+        )} kbps`,
       ]);
       report(TestEvent.MESSAGE, [
         'videoBandwidth',
-        `[ INFO ] Send bandwidth estimate max: ${bweStats.getMax() / 1000} kbps`
+        `[ INFO ] Send bandwidth estimate max: ${bweStats.getMax() / 1000} kbps`,
       ]);
       report(TestEvent.MESSAGE, [
         'videoBandwidth',
-        `[ INFO ] Send bandwidth ramp-up time: ${bweStats.getRampUpTime()} ms`
+        `[ INFO ] Send bandwidth ramp-up time: ${bweStats.getRampUpTime()} ms`,
       ]);
 
       report(TestEvent.MESSAGE, ['videoBandwidth', `[ INFO ] Packets sent: ${packetsSent}`]);
       report(TestEvent.MESSAGE, [
         'videoBandwidth',
-        `[ INFO ] Packets received: ${packetsReceived}`
+        `[ INFO ] Packets received: ${packetsReceived}`,
       ]);
       report(TestEvent.MESSAGE, ['videoBandwidth', `[ INFO ] NACK count: ${nackCount}`]);
       report(TestEvent.MESSAGE, [
         'videoBandwidth',
-        `[ INFO ] Picture loss indications: ${pliCount}`
+        `[ INFO ] Picture loss indications: ${pliCount}`,
       ]);
       report(TestEvent.MESSAGE, ['videoBandwidth', `[ INFO ] Quality predictor sum: ${qpSum}`]);
       report(TestEvent.MESSAGE, ['videoBandwidth', `[ INFO ] Frames encoded: ${framesEncoded}`]);
@@ -303,26 +305,26 @@ const gotStats = (response: any, time: any, response2: any, time2: any) => {
     if (parseInt(framerateMean, 10) > 0) {
       report(TestEvent.MESSAGE, [
         'videoBandwidth',
-        `[ OK ] Frame rate mean: ${parseInt(framerateMean, 10)}`
+        `[ OK ] Frame rate mean: ${parseInt(framerateMean, 10)}`,
       ]);
     } else {
       report(TestEvent.MESSAGE, [
         'videoBandwidth',
-        `[ FAILED ] Frame rate mean is 0, cannot test bandwidth without a working camera.`
+        `[ FAILED ] Frame rate mean is 0, cannot test bandwidth without a working camera.`,
       ]);
     }
     report(TestEvent.MESSAGE, [
       'videoBandwidth',
-      `[ INFO ] Send bitrate mean: ${parseInt(bitrateMean, 10) / 1000} kbps`
+      `[ INFO ] Send bitrate mean: ${parseInt(bitrateMean, 10) / 1000} kbps`,
     ]);
     report(TestEvent.MESSAGE, [
       'videoBandwidth',
-      `[ INFO ] Send bitrate standard deviation: ${parseInt(bitrateStdDev, 10) / 1000} kbps`
+      `[ INFO ] Send bitrate standard deviation: ${parseInt(bitrateStdDev, 10) / 1000} kbps`,
     ]);
   }
   report(TestEvent.MESSAGE, [
     'videoBandwidth',
-    `[ INFO ] RTT average: ${rttStats.getAverage()} ms`
+    `[ INFO ] RTT average: ${rttStats.getAverage()} ms`,
   ]);
   report(TestEvent.MESSAGE, ['videoBandwidth', `[ INFO ] RTT max: ${rttStats.getMax()} ms`]);
   report(TestEvent.MESSAGE, ['videoBandwidth', `[ INFO ] Packets lost: ${packetsLost}`]);
