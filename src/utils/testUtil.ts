@@ -461,19 +461,15 @@ export const asyncCreateTurnConfigDefault = (): RTCConfiguration => {
   // }
 };
 
-export const asyncCreateTurnConfig = memoize(
-  async (): Promise<RTCConfiguration> => {
-    const iceServersConfig = (await api.rest?.get('/plugins/ice-servers'))?.data?.data;
+export const asyncCreateTurnConfig = async (): Promise<RTCConfiguration> => {
+  const iceServersConfig = (await api.rest?.get('/plugins/ice-servers'))?.data;
 
-    if (iceServersConfig) {
-      return iceServersConfig;
-    }
+  if (iceServersConfig) {
+    return iceServersConfig;
+  }
 
-    return asyncCreateTurnConfigDefault();
-  },
-  // Cache only for a minute
-  () => Math.ceil(Date.now() / 1000 / 60),
-);
+  return asyncCreateTurnConfigDefault();
+};
 
 export const doGetUserMedia = async (constraints: MediaStreamConstraints): Promise<MediaStream> => {
   // const traceGumEvent = report.traceEventAsync('getusermedia');

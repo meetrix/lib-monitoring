@@ -49,13 +49,13 @@ export interface TestModalProps extends WithStyles<ButtonProps & typeof styles> 
 }
 
 function deriveStatus(data: ITestView[]) {
-  const status = data.every(({ status }) => status === '')
-    ? ''
-    : data.every(({ status }) => status === 'success')
+  const status = data.every(({ status }) => status === 'success')
     ? 'success'
-    : data.some(({ status }) => status === 'running' || status === '')
-    ? 'running'
-    : 'failure';
+    : data.every(({ status }) => status === '')
+    ? ''
+    : data.some(({ status }) => status === 'failure')
+    ? 'failure'
+    : 'running';
 
   let statusMessage = 'Tests not run';
   switch (status) {
@@ -80,7 +80,7 @@ const getLastAvailableSubMessage = (row: ITestView) => {
   for (let i = subComp.length - 1; i >= 0; i--) {
     const subComponent = subComp[i];
     const subMessage = row?.subMessages[subComponent] && [...row.subMessages[subComponent]].pop();
-    if (subMessage) {
+    if (subMessage) {      
       return subMessage;
     }
   }

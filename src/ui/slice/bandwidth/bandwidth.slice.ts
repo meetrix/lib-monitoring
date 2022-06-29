@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import deriveOverallStatus from '../../../utils/webrtctests/deriveOverallStatus';
 
 import { RootState } from '../../store/store';
 import { ISubMessages, ISubStatus, ITestState } from '../types';
@@ -45,7 +46,6 @@ export const bandwidthSlice = createSlice({
         case 'videoBandwidth':
           state.subMessages.videoBandwidth.push(action.payload[1]);
           break;
-
         default:
           break;
       }
@@ -60,11 +60,11 @@ export const bandwidthSlice = createSlice({
           state.subMessages.videoBandwidth = [];
           state.subStatus.videoBandwidth = 'running';
           break;
-
         default:
           break;
       }
-      state.status = 'running';
+      const subStatuses = [state.subStatus.throughput, state.subStatus.videoBandwidth];
+      state.status = deriveOverallStatus(subStatuses);
     },
     endTest(state, action) {
       switch (action.payload[0]) {
@@ -73,12 +73,12 @@ export const bandwidthSlice = createSlice({
           break;
         case 'videoBandwidth':
           state.subStatus.videoBandwidth = action.payload[1];
-          state.status = 'success';
           break;
-
         default:
           break;
       }
+      const subStatuses = [state.subStatus.throughput, state.subStatus.videoBandwidth];
+      state.status = deriveOverallStatus(subStatuses);
     },
   },
 });

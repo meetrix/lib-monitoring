@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import deriveOverallStatus from '../../../utils/webrtctests/deriveOverallStatus';
 
 import { RootState } from '../../store/store';
 import { ISubMessages, ISubStatus, ITestState } from '../types';
@@ -75,7 +76,8 @@ export const networkSlice = createSlice({
         default:
           break;
       }
-      state.status = 'running';
+      const subStatuses = [state.subStatus.udp, state.subStatus.tcp, state.subStatus.ipv6];
+      state.status = deriveOverallStatus(subStatuses);
     },
     endTest(state, action) {
       switch (action.payload[0]) {
@@ -87,12 +89,13 @@ export const networkSlice = createSlice({
           break;
         case 'ipv6':
           state.subStatus.ipv6 = action.payload[1];
-          state.status = 'success';
           break;
 
         default:
           break;
       }
+      const subStatuses = [state.subStatus.udp, state.subStatus.tcp, state.subStatus.ipv6];
+      state.status = deriveOverallStatus(subStatuses);
     },
   },
 });

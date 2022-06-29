@@ -101,7 +101,7 @@ class Call {
     peerConnection: RTCPeerConnection,
     peerConnection2: RTCPeerConnection,
     localStream: any,
-    statsCb: any
+    statsCb: any,
   ): Promise<void> => {
     debug('gatherStats()');
     const stats: any = [];
@@ -112,11 +112,11 @@ class Call {
     const statStepMs = 100;
     self.localTrackIds = {
       audio: '',
-      video: ''
+      video: '',
     };
     self.remoteTrackIds = {
       audio: '',
-      video: ''
+      video: '',
     };
 
     peerConnection.getSenders().forEach((sender: RTCRtpSender) => {
@@ -147,7 +147,7 @@ class Call {
         const enumeratedStats = await enumerateStats(
           response,
           self.localTrackIds,
-          self.remoteTrackIds
+          self.remoteTrackIds,
         );
         stats2.push(enumeratedStats);
         statsCollectTime2.push(Date.now());
@@ -170,7 +170,7 @@ class Call {
         const enumeratedStats = await enumerateStats(
           response,
           self.localTrackIds,
-          self.remoteTrackIds
+          self.remoteTrackIds,
         );
         stats.push(enumeratedStats);
         statsCollectTime.push(Date.now());
@@ -217,7 +217,7 @@ class Call {
   async gotOffer_(offer: RTCSessionDescriptionInit): Promise<void> {
     if (this.constrainOfferToRemoveVideoFec_) {
       offer.sdp = offer.sdp?.replace(/(m=video 1 [^\r]+)(116 117)(\r\n)/g, '$1\r\n');
-      offer.sdp = offer.sdp?.replace(/a=rtpmap:116 red\/90000\r\n/g, '');
+      // offer.sdp = offer.sdp?.replace(/a=rtpmap:116 red\/90000\r\n/g, '');
       offer.sdp = offer.sdp?.replace(/a=rtpmap:117 ulpfec\/90000\r\n/g, '');
       offer.sdp = offer.sdp?.replace(/a=rtpmap:98 rtx\/90000\r\n/g, '');
       offer.sdp = offer.sdp?.replace(/a=fmtp:98 apt=116\r\n/g, '');
@@ -232,7 +232,7 @@ class Call {
     if (this.constrainVideoBitrateKbps_) {
       answer.sdp = answer.sdp?.replace(
         /a=mid:video\r\n/g,
-        `a=mid:video\r\nb=AS:${this.constrainVideoBitrateKbps_}\r\n`
+        `a=mid:video\r\nb=AS:${this.constrainVideoBitrateKbps_}\r\n`,
       );
     }
     await this.pc2.setLocalDescription(answer);
@@ -241,7 +241,7 @@ class Call {
 
   async onIceCandidate_(
     otherPeer: RTCPeerConnection,
-    event: RTCPeerConnectionIceEvent
+    event: RTCPeerConnectionIceEvent,
   ): Promise<void> {
     if (event.candidate) {
       const parsed = this.parseCandidate(event.candidate.candidate);
@@ -283,7 +283,7 @@ class Call {
     return {
       type: fields[7],
       protocol: fields[2],
-      address: fields[4]
+      address: fields[4],
     };
   };
 }
