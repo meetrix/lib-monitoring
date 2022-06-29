@@ -29,6 +29,8 @@ export const getMediaInfo = async () => {
 };
 
 export default class API {
+  public static default: API;
+
   socket?: Socket;
   rest?: AxiosInstance;
 
@@ -80,6 +82,7 @@ export default class API {
       },
     );
 
+    API.default = this;
     setAPI(this);
   }
 

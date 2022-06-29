@@ -11,7 +11,6 @@ export const BACKEND_REST = `${BACKEND_URLS[environment]}/v1`;
 export const SOCKET_PATH = '/stats';
 
 export const API_KEY = process.env.API_KEY || '';
-
 export const turn = {
   uri: process.env.TURN_URI || 'turn:openrelay.metered.ca:80',
   username: process.env.TURN_USERNAME || 'openrelayproject',

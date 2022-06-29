@@ -10,6 +10,7 @@ import { videoActions, selectVideo } from '../slice/video/video.slice';
 import { networkActions, selectNetwork } from '../slice/network/network.slice';
 import { connectionActions, selectConnection } from '../slice/connection/connection.slice';
 import { bandwidthActions, selectBandwidth } from '../slice/bandwidth/bandwidth.slice';
+import { submitTroubleshooterSession } from '../slice/troubleshooter/troubleshooter.slice';
 import { TestEvent, TestEventCallback } from '../../utils/webrtctests/TestEvent';
 import { testBrowser, testCamera, testMicrophone, testNetwork } from '../../utils/webrtctests';
 import { generateFakeStateList } from '../../utils/webrtctests/fakeStateGenerator';
@@ -122,10 +123,10 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
   };
 
   const handleStart = async () => {
-    await testBrowser(mapCallbackToDispatch(browserActions));
-    await testMicrophone(mapCallbackToDispatch(audioActions));
-    await testCamera(mapCallbackToDispatch(videoActions));
-    await testNetwork((event, args) => {
+    const browserResult = await testBrowser(mapCallbackToDispatch(browserActions));
+    const microphoneResult = await testMicrophone(mapCallbackToDispatch(audioActions));
+    const cameraResult = await testCamera(mapCallbackToDispatch(videoActions));
+    const networkResult = await testNetwork((event, args) => {
       const [stage, rest] = (args as unknown) as [string, any];
 
       switch (stage) {
@@ -142,6 +143,17 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
           break;
       }
     });
+
+    const testStatus = {
+      browser: { status: browserResult },
+      microphone: { status: microphoneResult },
+      camera: { status: cameraResult },
+      network: { status: networkResult },
+
+      overall: { status: browserResult && microphoneResult && cameraResult && networkResult },
+    };
+
+    dispatch(submitTroubleshooterSession(testStatus));
   };
 
   // Accepts state of the last running component; all previous ones set to pass
