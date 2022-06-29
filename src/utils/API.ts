@@ -5,7 +5,7 @@ import { Report } from '@meetrix/webrtc-monitoring-common-lib';
 import { TimelineEvent } from '@peermetrics/webrtc-stats';
 import debugLib from 'debug';
 
-import { BACKEND_REST, BACKEND_WS, SOCKET_PATH } from '../config';
+import { SOCKET_PATH } from '../config';
 import { setAPI } from './testUtil';
 
 const debug = debugLib('localStorageUtils:');
@@ -14,6 +14,7 @@ debug.enabled = true;
 export interface ApiOptions {
   token: string;
   clientId: string;
+  baseUrl: string;
   options?: SocketOptions & ManagerOptions;
 }
 
@@ -34,8 +35,11 @@ export default class API {
   socket?: Socket;
   rest?: AxiosInstance;
 
-  constructor({ token, clientId, options }: ApiOptions) {
-    this.socket = io(BACKEND_WS, {
+  constructor({ token, clientId, baseUrl, options }: ApiOptions) {
+    const backendWs = `${baseUrl}/clients`;
+    const backendRest = `${baseUrl}/v1`;
+
+    this.socket = io(backendWs, {
       path: SOCKET_PATH,
       auth: {
         token,
@@ -62,7 +66,7 @@ export default class API {
     this.socket.io.on('ping', sendMediaInfo);
 
     this.rest = axios.create({
-      baseURL: BACKEND_REST,
+      baseURL: backendRest,
       headers: {
         Authorization: `Bearer ${token}`,
         'X-Client-Id': clientId,

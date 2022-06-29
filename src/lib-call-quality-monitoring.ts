@@ -3,21 +3,23 @@
 // ...
 import { AddPeerOptions, TimelineEvent, WebRTCStats } from '@peermetrics/webrtc-stats';
 import { nanoid } from 'nanoid';
+import debugLib from 'debug';
+
 import { EventTypes, MonitoringConstructorOptions } from './types';
-import { mountUI, updateUI } from './ui';
 import API from './utils/API';
 import { getReportFromTimelineEvent, handleReport } from './utils/localReport';
 import { getClientId, setClientId } from './utils/localStorageUtils';
 import { getUrlParams } from './utils/urlUtils';
-import debugLib from 'debug';
-
+import { mountUI, updateUI } from './ui';
 import {
   testBrowser,
   testCamera,
   TestEventCallback,
   testMicrophone,
-  testNetwork
+  testNetwork,
 } from './utils/webrtctests';
+
+import { BACKEND_URL } from './config';
 
 const debug = debugLib('localStorageUtils:');
 debug.enabled = true;
@@ -28,7 +30,7 @@ export default class Monitor {
   clientId: string;
 
   constructor(options: MonitoringConstructorOptions) {
-    const { token: _token, clientId: _clientId } = options || {};
+    const { token: _token, clientId: _clientId, baseUrl = BACKEND_URL } = options || {};
     // allow overriding via url parameters
     const { clientId: urlClientId, token: urlToken } = getUrlParams();
     const clientId = urlClientId || _clientId || getClientId();
@@ -41,7 +43,7 @@ export default class Monitor {
       setClientId(newClientId);
       this.clientId = newClientId;
     }
-    this.api = token ? new API({ token, clientId: this.clientId }) : undefined;
+    this.api = token ? new API({ token, clientId: this.clientId, baseUrl }) : undefined;
     this.stats = new WebRTCStats({
       getStatsInterval: 5000,
       rawStats: true,
@@ -50,10 +52,10 @@ export default class Monitor {
       wrapGetUserMedia: true,
       debug: false,
       remote: false,
-      logLevel: 'error'
+      logLevel: 'error',
     });
     const events: EventTypes[] = [
-      'timeline'
+      'timeline',
       //'stats',
       //'getUserMedia',
       //'peer',

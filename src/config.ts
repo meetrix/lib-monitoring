@@ -6,8 +6,7 @@ const BACKEND_URLS = {
   production: 'https://stats.meetrix.io',
 };
 
-export const BACKEND_WS = `${BACKEND_URLS[environment]}/clients`;
-export const BACKEND_REST = `${BACKEND_URLS[environment]}/v1`;
+export const BACKEND_URL = BACKEND_URLS[environment];
 export const SOCKET_PATH = '/stats';
 
 export const API_KEY = process.env.API_KEY || '';
