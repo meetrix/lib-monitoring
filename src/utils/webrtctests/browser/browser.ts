@@ -1,26 +1,8 @@
-import DetectRTC from 'detectrtc';
-
+import { promisifyDetectRTC } from '../agentData/agentData';
 import { TestEvent, TestEventCallback } from '../TestEvent';
-
-const timeout = <T>(promise: Promise<T>, ms: number = 10_000) => {
-  return Promise.race([
-    promise,
-    new Promise<never>((_resolve, reject) => setTimeout(() => reject('Operation timed out.'), ms)),
-  ]);
-};
 
 const sleep = (ms: number) => {
   return new Promise(resolve => setTimeout(resolve, ms));
-};
-
-const promisifyDetectRTC = async (): Promise<typeof DetectRTC> => {
-  return timeout(
-    new Promise(async (resolve, reject) => {
-      DetectRTC.load(() => {
-        resolve(DetectRTC);
-      });
-    }),
-  );
 };
 
 let report: TestEventCallback;

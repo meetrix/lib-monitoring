@@ -6,7 +6,8 @@ import {
   connectionReducer,
   networkReducer,
   videoReducer,
-  bandwidthReducer
+  bandwidthReducer,
+  troubleshooterReducer,
 } from '../slice';
 
 export const store = configureStore({
@@ -16,8 +17,9 @@ export const store = configureStore({
     video: videoReducer,
     network: networkReducer,
     connection: connectionReducer,
-    bandwidth: bandwidthReducer
-  }
+    bandwidth: bandwidthReducer,
+    troubleshooter: troubleshooterReducer,
+  },
 });
 
 export type AppDispatch = typeof store.dispatch;
