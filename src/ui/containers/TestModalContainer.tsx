@@ -102,7 +102,7 @@ type ActionsType =
   | typeof bandwidthActions;
 
 export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) => {
-  const { mockStats, mockArgs } = getUrlParams();
+  const { mockStats, troubleshooterMock, troubleshooterOnly } = getUrlParams();
   const dispatch = useAppDispatch();
   const status = useStatus();
 
@@ -122,27 +122,39 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
     }
   };
 
-  const handleStart = async () => {
-    const browserResult = await testBrowser(mapCallbackToDispatch(browserActions));
-    const microphoneResult = await testMicrophone(mapCallbackToDispatch(audioActions));
-    const cameraResult = await testCamera(mapCallbackToDispatch(videoActions));
-    const networkResult = await testNetwork((event, args) => {
-      const [stage, rest] = (args as unknown) as [string, any];
+  const shouldRunTest = (test: string) => {
+    return !troubleshooterOnly || troubleshooterOnly.includes(test);
+  };
 
-      switch (stage) {
-        case 'network':
-          mapCallbackToDispatch(networkActions)(event, rest);
-          break;
-        case 'connection':
-          mapCallbackToDispatch(connectionActions)(event, rest);
-          break;
-        case 'bandwidth':
-          mapCallbackToDispatch(bandwidthActions)(event, rest);
-          break;
-        default:
-          break;
-      }
-    });
+  const handleStart = async () => {
+    const browserResult = shouldRunTest('browser')
+      ? await testBrowser(mapCallbackToDispatch(browserActions))
+      : true;
+    const microphoneResult = shouldRunTest('audio')
+      ? await testMicrophone(mapCallbackToDispatch(audioActions))
+      : true;
+    const cameraResult = shouldRunTest('video')
+      ? await testCamera(mapCallbackToDispatch(videoActions))
+      : true;
+    const networkResult = shouldRunTest('network')
+      ? await testNetwork((event, args) => {
+          const [stage, rest] = (args as unknown) as [string, any];
+
+          switch (stage) {
+            case 'network':
+              mapCallbackToDispatch(networkActions)(event, rest);
+              break;
+            case 'connection':
+              mapCallbackToDispatch(connectionActions)(event, rest);
+              break;
+            case 'bandwidth':
+              mapCallbackToDispatch(bandwidthActions)(event, rest);
+              break;
+            default:
+              break;
+          }
+        })
+      : true;
 
     const testStatus = {
       browser: { status: browserResult },
@@ -157,15 +169,17 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
   };
 
   // Accepts state of the last running component; all previous ones set to pass
-  // e.g.: http://localhost:8080/?mockStats=true&mockArgs=component=camera,status=running
-  const componentArg = ((components.includes(mockArgs?.component as any) && mockArgs?.component) ||
+  // e.g.: http://localhost:8080/?mockStats=true&troubleshooterMock=component=camera,status=running
+  const componentArg = ((components.includes(troubleshooterMock?.component as any) &&
+    troubleshooterMock?.component) ||
     'network') as typeof components[number];
-  const statusArg = ((statuses.includes(mockArgs?.status as any) && mockArgs?.status) ||
+  const statusArg = ((statuses.includes(troubleshooterMock?.status as any) &&
+    troubleshooterMock?.status) ||
     'failure') as typeof statuses[number];
   const subComponentArg = (([...subComponents[componentArg]].includes(
-    mockArgs?.subComponent as any,
+    troubleshooterMock?.subComponent as any,
   ) &&
-    mockArgs?.subComponent) ||
+    troubleshooterMock?.subComponent) ||
     'connection-reflexive') as typeof subComponents[typeof components[number]][number];
   const sampleData = generateFakeStateList({
     component: componentArg,
