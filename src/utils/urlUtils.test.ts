@@ -7,9 +7,9 @@ describe('UrlParameters', () => {
     expect(mockStats).toEqual(true);
   });
 
-  it('should extract mockArgs', () => {
-    const url = '?mockStats=true&mockArgs=key1=value1,key2=value2';
-    const { mockArgs } = getUrlParams(url);
-    expect(mockArgs).toEqual({ key1: 'value1', key2: 'value2' });
+  it('should extract troubleshooterMock', () => {
+    const url = '?mockStats=true&troubleshooterMock=key1=value1,key2=value2';
+    const { troubleshooterMock } = getUrlParams(url);
+    expect(troubleshooterMock).toEqual({ key1: 'value1', key2: 'value2' });
   });
 });

@@ -16,17 +16,25 @@ The tests run on `node` environment instead of the real browser environment. Bec
 
 ## Testing UI
 
-UI can be tested by passing url params
+UI can be tested by passing url search params
 
-eg: [http://localhost:8080/?mockStats=true]
+1. `mockStatus=true` mocks troubleshooter and other tests
+2. `troubleshooterMock=component=camera,status=running` sets the given status to the selected troubleshooter test, and sets 'success' status to all preceding tests.
+
+e.g.: [http://localhost:8080/?mockStats=true&troubleshooterMock=component=camera,status=running]
 
 ## Building production bundle
 
 Run `npm run build`
 
-Please note that this command might not exit because of `rollup-plugin-livereload`
-
-
 ## URL Parameters
 
-[http://localhost:8080/?mockStats=true&clientId=1234&token=x.x.x]
+1. `mockStatus` search param: see above Testing UI section
+2. `troubleshooterMock` search param: see above Testing UI section
+3. `troubleshooterOnly` run only selected troubleshooter tests: (default `browser,audio,video,network`)
+4. `clientId` sets the clientId (by default automatically generated and saved in the browser)
+5. `token` sets the JWT auth token for a. a user or, b. a plugin
+
+See more: src/utils/urlUtils.ts
+
+e.g.: [http://localhost:8080/?mockStats=true&clientId=1234&token=x.x.x]
