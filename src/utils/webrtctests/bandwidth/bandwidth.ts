@@ -350,7 +350,6 @@ const sleep = (time: number): Promise<void> => {
 };
 
 const runBandwidthTests = async (callback: TestEventCallback): Promise<boolean> => {
-  return true; // TODO: Fix this test
   await sleep(1000);
   debug(Date.now());
   // Set up a datachannel between two peers through a relay
@@ -364,6 +363,15 @@ const runBandwidthTests = async (callback: TestEventCallback): Promise<boolean> 
   // (packets should stay on the link if behind a router doing NAT)
   await initBandwidthTestVideoBandwidth(callback);
   await sleep(1000);
+
+  // Uncomment when testing
+  // callback(TestEvent.START, 'throughput');
+  // await sleep(2000);
+  // callback(TestEvent.END, ['throughput', 'success']);
+  // await sleep(1000);
+  // callback(TestEvent.START, 'videoBandwidth');
+  // await sleep(2000);
+  // callback(TestEvent.END, ['videoBandwidth', 'success']);
 
   return true; // TODO: Return proper status
 };

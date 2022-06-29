@@ -15,13 +15,13 @@ export { default as testCamera } from './video/video';
 // Temporary facade to unify the network APIs
 export async function testNetwork(callback: TestEventCallback): Promise<boolean> {
   const networkStatus = await runNetworkTests((event, ...args: any) =>
-    callback(event, ['network', ...args])
+    callback(event, ['network', ...args]),
   );
   const connectionStatus = await runConnectionTests((event, ...args: any) =>
-    callback(event, ['connection', ...args])
+    callback(event, ['connection', ...args]),
   );
   const bandwidthStatus = await runBandwidthTests((event, ...args: any) =>
-    callback(event, ['bandwidth', ...args])
+    callback(event, ['bandwidth', ...args]),
   );
 
   return networkStatus && connectionStatus && bandwidthStatus;

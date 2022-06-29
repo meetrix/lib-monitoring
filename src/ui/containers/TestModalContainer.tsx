@@ -14,6 +14,7 @@ import { TestEvent, TestEventCallback } from '../../utils/webrtctests/TestEvent'
 import { testBrowser, testCamera, testMicrophone, testNetwork } from '../../utils/webrtctests';
 import { generateFakeStateList } from '../../utils/webrtctests/fakeStateGenerator';
 import { components, ITestView, statuses, subComponents } from '../slice/types';
+import deriveOverallStatus from '../../utils/webrtctests/deriveOverallStatus';
 
 const useStatus = () => {
   const browserStatus = useSelector(selectBrowser);
@@ -23,19 +24,12 @@ const useStatus = () => {
   const connectionStatus = useSelector(selectConnection);
   const bandwidthStatus = useSelector(selectBandwidth);
 
-  let overallNetworkStatus = '';
   const subNetworkStatuses = [
     networkStatus.status,
     connectionStatus.status,
     bandwidthStatus.status,
   ];
-  if (subNetworkStatuses.every(status => status === 'success')) {
-    overallNetworkStatus = 'success';
-  } else if (subNetworkStatuses.some(status => status === 'failure')) {
-    overallNetworkStatus = 'failure';
-  } else if (subNetworkStatuses.some(status => status === 'running')) {
-    overallNetworkStatus = 'running';
-  }
+  const overallNetworkStatus = deriveOverallStatus(subNetworkStatuses);
 
   const overallNetworkError = [
     networkStatus.message,
@@ -44,15 +38,26 @@ const useStatus = () => {
   ]
     .filter(Boolean)
     .join(', ');
+
   const overallSubMessages = {
-    network: networkStatus.subMessages,
-    connection: connectionStatus.subMessages,
-    bandwidth: bandwidthStatus.subMessages,
+    'network-udp': networkStatus.subMessages.udp,
+    'network-tcp': networkStatus.subMessages.tcp,
+    'network-ipv6': networkStatus.subMessages.ipv6,
+    'connection-host': connectionStatus.subMessages.host,
+    'connection-reflexive': connectionStatus.subMessages.reflexive,
+    'connection-relay': connectionStatus.subMessages.relay,
+    'bandwidth-throughput': bandwidthStatus.subMessages.throughput,
+    'bandwidth-videoBandwidth': bandwidthStatus.subMessages.videoBandwidth,
   };
   const overallSubStatus = {
-    network: networkStatus.subStatus,
-    connection: connectionStatus.subStatus,
-    bandwidth: bandwidthStatus.subStatus,
+    'network-udp': networkStatus.subStatus.udp,
+    'network-tcp': networkStatus.subStatus.tcp,
+    'network-ipv6': networkStatus.subStatus.ipv6,
+    'connection-host': connectionStatus.subStatus.host,
+    'connection-reflexive': connectionStatus.subStatus.reflexive,
+    'connection-relay': connectionStatus.subStatus.relay,
+    'bandwidth-throughput': bandwidthStatus.subStatus.throughput,
+    'bandwidth-videoBandwidth': bandwidthStatus.subStatus.videoBandwidth,
   };
 
   return [
@@ -121,7 +126,8 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
     await testMicrophone(mapCallbackToDispatch(audioActions));
     await testCamera(mapCallbackToDispatch(videoActions));
     await testNetwork((event, args) => {
-      const [stage, ...rest] = (args as unknown) as [string, any];
+      const [stage, rest] = (args as unknown) as [string, any];
+
       switch (stage) {
         case 'network':
           mapCallbackToDispatch(networkActions)(event, rest);
