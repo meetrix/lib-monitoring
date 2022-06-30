@@ -2,6 +2,7 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Debug from 'debug';
+import { memoize } from 'lodash';
 
 import API from './API';
 import { stun, turn } from '../config';
@@ -453,8 +454,14 @@ export const asyncCreateTurnConfigDefault = (): RTCConfiguration => {
   // }
 };
 
+const fetchTurnConfigCached = memoize(
+  async (): Promise<RTCConfiguration> =>
+    (await API.default.rest?.get('/plugins/ice-servers'))?.data,
+  () => Math.ceil(Date.now() / 1000 / 60),
+);
+
 export const asyncCreateTurnConfig = async (): Promise<RTCConfiguration> => {
-  const iceServersConfig = (await API.default.rest?.get('/plugins/ice-servers'))?.data;
+  const iceServersConfig = await fetchTurnConfigCached();
 
   if (iceServersConfig) {
     return iceServersConfig;

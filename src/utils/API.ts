@@ -1,6 +1,5 @@
 import io, { Socket, SocketOptions, ManagerOptions } from 'socket.io-client';
 import axios, { AxiosInstance } from 'axios';
-import createAuthRefreshInterceptor from 'axios-auth-refresh';
 
 import { Report } from '@meetrix/webrtc-monitoring-common-lib';
 import { TimelineEvent } from '@peermetrics/webrtc-stats';
@@ -34,7 +33,16 @@ export default class API {
 
   socket?: Socket;
   rest?: AxiosInstance;
-  jwt?: string;
+
+  private jwt?: string;
+  async getJwt(backendRest: string, token: string) {
+    if (!this.jwt) {
+      const jwtResponse = await axios.post(`${backendRest}/plugins/${token}/token`);
+      this.jwt = jwtResponse.data.data;
+    }
+
+    return this.jwt;
+  }
 
   constructor({ token, clientId, baseUrl, options }: ApiOptions) {
     const backendWs = `${baseUrl}/clients`;
@@ -42,9 +50,7 @@ export default class API {
 
     this.socket = io(backendWs, {
       path: SOCKET_PATH,
-      auth: {
-        token,
-      },
+      auth: cb => this.getJwt(backendRest, token).then(jwt => cb({ token: jwt })),
       query: {
         clientId,
       },
@@ -74,16 +80,12 @@ export default class API {
       },
     });
 
-    createAuthRefreshInterceptor(this.rest, async failedRequest => {
-      const tokenRefreshResponse = await axios.post(`${backendRest}/plugins/${token}/token`);
-      this.jwt = tokenRefreshResponse.data;
-      failedRequest.response.config.headers.Authorization = `Bearer ${tokenRefreshResponse.data.token}`;
-      return Promise.resolve();
-    });
-
-    axios.interceptors.request.use(request => {
-      if (request.headers && this.jwt) {
-        request.headers.Authorization = `Bearer ${this.jwt}`;
+    this.rest.interceptors.request.use(async request => {
+      if (!request.headers?.Authorization) {
+        request.headers = {
+          ...request.headers,
+          Authorization: `Bearer ${await this.getJwt(backendRest, token)}`,
+        };
       }
       return request;
     });
@@ -92,10 +94,21 @@ export default class API {
       response => {
         return response.data;
       },
-      error => {
+      async error => {
+        const originalRequest = error.config;
+        if (error.response.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+          originalRequest.headers = {
+            ...originalRequest.headers,
+            Authorization: `Bearer ${await this.getJwt(backendRest, token)}`,
+          };
+          return this.rest?.(originalRequest);
+        }
+
         if (error.response) {
           return Promise.reject(error.response.data);
         }
+
         return Promise.reject(error);
       },
     );

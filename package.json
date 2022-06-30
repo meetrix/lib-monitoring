@@ -162,7 +162,6 @@
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "axios": "^0.27.2",
-    "axios-auth-refresh": "^3.3.1",
     "detectrtc": "^1.4.1",
     "lodash": "^4.17.21",
     "nanoid": "^3.1.30",
