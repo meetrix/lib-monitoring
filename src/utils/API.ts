@@ -1,12 +1,12 @@
 import io, { Socket, SocketOptions, ManagerOptions } from 'socket.io-client';
 import axios, { AxiosInstance } from 'axios';
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
 
 import { Report } from '@meetrix/webrtc-monitoring-common-lib';
 import { TimelineEvent } from '@peermetrics/webrtc-stats';
 import debugLib from 'debug';
 
 import { SOCKET_PATH } from '../config';
-import { setAPI } from './testUtil';
 
 const debug = debugLib('localStorageUtils:');
 debug.enabled = true;
@@ -34,6 +34,7 @@ export default class API {
 
   socket?: Socket;
   rest?: AxiosInstance;
+  jwt?: string;
 
   constructor({ token, clientId, baseUrl, options }: ApiOptions) {
     const backendWs = `${baseUrl}/clients`;
@@ -68,10 +69,23 @@ export default class API {
     this.rest = axios.create({
       baseURL: backendRest,
       headers: {
-        Authorization: `Bearer ${token}`,
         'X-Client-Id': clientId,
         'Content-Type': 'application/json',
       },
+    });
+
+    createAuthRefreshInterceptor(this.rest, async failedRequest => {
+      const tokenRefreshResponse = await axios.post(`${backendRest}/plugins/${token}/token`);
+      this.jwt = tokenRefreshResponse.data.data;
+      failedRequest.response.config.headers.Authorization = `Bearer ${tokenRefreshResponse.data.token}`;
+      return Promise.resolve();
+    });
+
+    axios.interceptors.request.use(request => {
+      if (request.headers && this.jwt) {
+        request.headers.Authorization = `Bearer ${this.jwt}`;
+      }
+      return request;
     });
 
     this.rest.interceptors.response.use(
@@ -87,7 +101,6 @@ export default class API {
     );
 
     API.default = this;
-    setAPI(this);
   }
 
   async report(report: Report) {

@@ -1,6 +1,6 @@
 {
   "name": "@meetrix/lib-monitoring",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "keywords": [],
   "main": "./dist/lib/lib-call-quality-monitoring.js",
@@ -156,8 +156,9 @@
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "axios": "^0.27.2",
-    "lodash": "^4.17.21",
+    "axios-auth-refresh": "^3.3.1",
     "detectrtc": "^1.4.1",
+    "lodash": "^4.17.21",
     "nanoid": "^3.1.30",
     "qs": "^6.10.2",
     "react": "^17.0.2",
