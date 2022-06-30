@@ -76,7 +76,7 @@ export default class API {
 
     createAuthRefreshInterceptor(this.rest, async failedRequest => {
       const tokenRefreshResponse = await axios.post(`${backendRest}/plugins/${token}/token`);
-      this.jwt = tokenRefreshResponse.data.data;
+      this.jwt = tokenRefreshResponse.data;
       failedRequest.response.config.headers.Authorization = `Bearer ${tokenRefreshResponse.data.token}`;
       return Promise.resolve();
     });

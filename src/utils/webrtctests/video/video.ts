@@ -32,7 +32,7 @@ import {
   arrayMax,
   arrayMin,
   doGetUserMedia,
-  setTimeoutWithProgressBar
+  setTimeoutWithProgressBar,
 } from '../../testUtil';
 import Call from '../../call';
 import VideoFrameChecker from './videoframechecker';
@@ -53,7 +53,7 @@ let report: TestEventCallback;
 const initVideoTest = async (
   callback: TestEventCallback,
   resolutionsArg: number[][],
-  typeArg: string
+  typeArg: string,
 ): Promise<boolean> => {
   resolutions = resolutionsArg;
   resolutionSuccessStatus = new Array(resolutions.length).fill(true);
@@ -75,8 +75,8 @@ const runVideoTest = async (resolution: number[]) => {
     audio: false,
     video: {
       width: { exact: resolution[0] },
-      height: { exact: resolution[1] }
-    }
+      height: { exact: resolution[1] },
+    },
   };
   try {
     aStream = await doGetUserMedia(constraints);
@@ -167,7 +167,7 @@ const collectAndAnalyzeStats_ = async (resolution: number[]) => {
     call.pc1,
     call.pc2,
     aStream,
-    onCallEnded_.bind(this, resolution, video, aStream, frameChecker)
+    onCallEnded_.bind(this, resolution, video, aStream, frameChecker),
   );
 
   await setTimeoutWithProgressBar(8000);
@@ -180,7 +180,7 @@ const onCallEnded_ = (
   stream: any,
   frameChecker: any,
   stats: any,
-  statsTime: any
+  statsTime: any,
 ) => {
   debug('onCallEnded_()');
   analyzeStats_(resolution, videoElement, stream, frameChecker, stats, statsTime);
@@ -196,7 +196,7 @@ const analyzeStats_ = (
   stream: any,
   frameChecker: any,
   stats: any,
-  statsTime: any
+  statsTime: any,
 ) => {
   debug('analyzeStats_()');
   const googAvgEncodeTime = [];
@@ -234,7 +234,7 @@ const analyzeStats_ = (
     isMuted,
     testedFrames: frameStats.numFrames,
     blackFrames: frameStats.numBlackFrames,
-    frozenFrames: frameStats.numFrozenFrames
+    frozenFrames: frameStats.numFrozenFrames,
   };
 
   // TODO: Add a reportInfo() function with a table format to display
@@ -267,7 +267,7 @@ const resolutionMatchesIndependentOfRotationOrCrop_ = (
   aWidth: any,
   aHeight: any,
   bWidth: any,
-  bHeight: any
+  bHeight: any,
 ) => {
   const minRes = Math.min(bWidth, bHeight);
   return (
@@ -304,7 +304,7 @@ const testExpectations_ = (info: any) => {
       info.actualVideoWidth,
       info.actualVideoHeight,
       info.mandatoryWidth,
-      info.mandatoryHeight
+      info.mandatoryHeight,
     )
   ) {
     report(TestEvent.MESSAGE, [type, '[ FAILED ] Incorrect captured resolution.']);
@@ -358,15 +358,18 @@ const runVideoTests = async (callback: TestEventCallback): Promise<boolean> => {
       [1920, 1080],
       [1920, 1200],
       [3840, 2160],
-      [4096, 2160]
+      [4096, 2160],
     ],
-    'generic'
+    'generic',
   );
   await sleep(1000);
   debug(Date.now());
 
-  // TODO: Decide success logic
-  return p240 && p480 && p720; // generic omitted
+  const success = p240 && p480 && p720;
+  if (success) {
+    callback(TestEvent.MESSAGE, ['generic', `[ OK ] Mandatory conditions satisfied.`]);
+  }
+  return success; // generic omitted
 };
 
 export default runVideoTests;
