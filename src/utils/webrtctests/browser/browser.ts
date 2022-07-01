@@ -92,12 +92,12 @@ const runBrowserTests = async (callback: TestEventCallback): Promise<boolean> =>
       isWebRTCSupported,
     ];
     if (mandatory.some(x => !x)) {
-      report(TestEvent.MESSAGE, `[ FAILED ] Mandatory conditions not satisfied.`);
+      report(TestEvent.MESSAGE, `[ FAILED ] Mandatory conditions not satisfied`);
       report(TestEvent.END, 'failure');
       return false;
     }
 
-    report(TestEvent.MESSAGE, `[ OK ] Mandatory conditions satisfied.`);
+    report(TestEvent.MESSAGE, `[ OK ] Mandatory conditions satisfied`);
     report(TestEvent.END, 'success');
     return true;
   } catch (error) {

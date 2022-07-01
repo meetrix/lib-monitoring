@@ -367,7 +367,7 @@ const runVideoTests = async (callback: TestEventCallback): Promise<boolean> => {
 
   const success = p240 && p480 && p720;
   if (success) {
-    callback(TestEvent.MESSAGE, ['generic', `[ OK ] Mandatory conditions satisfied.`]);
+    callback(TestEvent.MESSAGE, ['generic', `[ OK ] Mandatory conditions satisfied`]);
   }
   return success; // generic omitted
 };

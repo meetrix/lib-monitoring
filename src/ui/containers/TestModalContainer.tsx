@@ -10,7 +10,10 @@ import { videoActions, selectVideo } from '../slice/video/video.slice';
 import { networkActions, selectNetwork } from '../slice/network/network.slice';
 import { connectionActions, selectConnection } from '../slice/connection/connection.slice';
 import { bandwidthActions, selectBandwidth } from '../slice/bandwidth/bandwidth.slice';
-import { submitTroubleshooterSession } from '../slice/troubleshooter/troubleshooter.slice';
+import {
+  selectTroubleshooter,
+  submitTroubleshooterSession,
+} from '../slice/troubleshooter/troubleshooter.slice';
 import { TestEvent, TestEventCallback } from '../../utils/webrtctests/TestEvent';
 import { testBrowser, testCamera, testMicrophone, testNetwork } from '../../utils/webrtctests';
 import { generateFakeStateList } from '../../utils/webrtctests/fakeStateGenerator';
@@ -105,6 +108,7 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
   const { mockStats, troubleshooterMock, troubleshooterOnly } = getUrlParams();
   const dispatch = useAppDispatch();
   const status = useStatus();
+  const submittedResponse = useSelector(selectTroubleshooter);
 
   const mapCallbackToDispatch: (actions: ActionsType) => TestEventCallback = (
     actions: ActionsType,
@@ -189,6 +193,7 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
 
   return (
     <TestModal
+      testId={submittedResponse?.data?._id}
       open={open}
       onClose={onClose}
       onRetry={mockStats ? () => {} : handleStart}

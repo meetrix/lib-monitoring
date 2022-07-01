@@ -44,6 +44,7 @@ export interface TestModalProps extends WithStyles<ButtonProps & typeof styles> 
   label?: string;
   open: boolean;
   data: ITestView[];
+  testId?: string;
   onClose?: () => void;
   onRetry?: () => void;
 }
@@ -80,7 +81,7 @@ const getLastAvailableSubMessage = (row: ITestView) => {
   for (let i = subComp.length - 1; i >= 0; i--) {
     const subComponent = subComp[i];
     const subMessage = row?.subMessages[subComponent] && [...row.subMessages[subComponent]].pop();
-    if (subMessage) {      
+    if (subMessage) {
       return subMessage;
     }
   }
@@ -93,6 +94,7 @@ export const TestModal: React.FC<TestModalProps> = ({
   label,
   open,
   data,
+  testId,
   onClose: handleClose,
   onRetry: handleRetry,
   ...otherProps
@@ -138,7 +140,7 @@ export const TestModal: React.FC<TestModalProps> = ({
         <TestListRow label={statusMessage} status={status} />
         <div className={classes.bottomWrapper}>
           <Typography id="test-modal-title" variant="caption" color="darkgray">
-            TEST ID :234 - VIEW LOG
+            {testId && `TEST ID: ${testId}`}
           </Typography>
           <Button disabled={status === 'running'} onClick={handleRetry}>
             Test again
