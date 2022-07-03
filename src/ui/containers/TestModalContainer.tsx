@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import getUrlParams from '../../utils/urlUtils';
@@ -16,6 +16,7 @@ import { testBrowser, testCamera, testMicrophone, testNetwork } from '../../util
 import { generateFakeStateList } from '../../utils/webrtctests/fakeStateGenerator';
 import { components, ITestView, statuses, subComponents } from '../slice/types';
 import deriveOverallStatus from '../../utils/webrtctests/deriveOverallStatus';
+import SetupModal from '../components/SetupModal';
 
 const useStatus = () => {
   const browserStatus = useSelector(selectBrowser);
@@ -102,9 +103,20 @@ type ActionsType =
   | typeof bandwidthActions;
 
 export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) => {
-  const { mockStats, troubleshooterMock, troubleshooterOnly } = getUrlParams();
+  const {
+    mockStats,
+    troubleshooterMock,
+    troubleshooterOnly,
+    email: autofillEmail,
+  } = getUrlParams();
   const dispatch = useAppDispatch();
   const status = useStatus();
+  const [email, setEmail] = useState('');
+  const [emailEntered, setEmailEntered] = useState(false);
+
+  useEffect(() => {
+    setEmail(autofillEmail || '');
+  }, [autofillEmail]);
 
   const mapCallbackToDispatch: (actions: ActionsType) => TestEventCallback = (
     actions: ActionsType,
@@ -127,6 +139,8 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
   };
 
   const handleStart = async () => {
+    setEmailEntered(true);
+
     const browserResult = shouldRunTest('browser')
       ? await testBrowser(mapCallbackToDispatch(browserActions))
       : true;
@@ -165,7 +179,7 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
       overall: { status: browserResult && microphoneResult && cameraResult && networkResult },
     };
 
-    dispatch(submitTroubleshooterSession(testStatus));
+    dispatch(submitTroubleshooterSession({ email, tests: testStatus }));
   };
 
   // Accepts state of the last running component; all previous ones set to pass
@@ -188,11 +202,20 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
   });
 
   return (
-    <TestModal
-      open={open}
-      onClose={onClose}
-      onRetry={mockStats ? () => {} : handleStart}
-      data={mockStats ? sampleData : status}
-    />
+    <>
+      <SetupModal
+        open={!emailEntered}
+        email={email}
+        onEmailChange={setEmail}
+        onStart={handleStart}
+        startLabel="START TEST"
+      />
+      <TestModal
+        open={open && emailEntered}
+        onClose={onClose}
+        onRetry={mockStats ? () => {} : handleStart}
+        data={mockStats ? sampleData : status}
+      />
+    </>
   );
 };
