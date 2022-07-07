@@ -39,10 +39,11 @@ export const troubleshooterSlice = createSlice({
 
 export const submitTroubleshooterSession = createAsyncThunk(
   'troubleshooter',
-  async (tests: any) => {
+  async ({ email, tests }: { email: string; tests: any }) => {
     const agentData = await getAgentData();
     const response = await API.default?.rest?.post('/troubleshooter', {
       metadata: agentData,
+      email,
       tests,
     });
     return response?.data;
