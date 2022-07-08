@@ -1,18 +1,11 @@
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import axios from 'axios';
 import Debug from 'debug';
-import { get, memoize } from 'lodash';
+import { memoize } from 'lodash';
 
-import { stun, turn } from '../config';
 import API from './API';
-
-let api: API;
-export const setAPI = (apiInstance: API) => {
-  api = apiInstance;
-};
+import { stun, turn } from '../config';
 
 const debug = Debug('utils');
 
@@ -461,8 +454,14 @@ export const asyncCreateTurnConfigDefault = (): RTCConfiguration => {
   // }
 };
 
+const fetchTurnConfigCached = memoize(
+  async (): Promise<RTCConfiguration> =>
+    (await API.default.rest?.get('/plugins/ice-servers'))?.data,
+  () => Math.ceil(Date.now() / 1000 / 60),
+);
+
 export const asyncCreateTurnConfig = async (): Promise<RTCConfiguration> => {
-  const iceServersConfig = (await api.rest?.get('/plugins/ice-servers'))?.data;
+  const iceServersConfig = await fetchTurnConfigCached();
 
   if (iceServersConfig) {
     return iceServersConfig;

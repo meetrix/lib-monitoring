@@ -5,8 +5,7 @@ import { Report } from '@meetrix/webrtc-monitoring-common-lib';
 import { TimelineEvent } from '@peermetrics/webrtc-stats';
 import debugLib from 'debug';
 
-import { BACKEND_REST, BACKEND_WS, SOCKET_PATH } from '../config';
-import { setAPI } from './testUtil';
+import { SOCKET_PATH } from '../config';
 
 const debug = debugLib('localStorageUtils:');
 debug.enabled = true;
@@ -14,6 +13,7 @@ debug.enabled = true;
 export interface ApiOptions {
   token: string;
   clientId: string;
+  baseUrl: string;
   options?: SocketOptions & ManagerOptions;
 }
 
@@ -34,12 +34,23 @@ export default class API {
   socket?: Socket;
   rest?: AxiosInstance;
 
-  constructor({ token, clientId, options }: ApiOptions) {
-    this.socket = io(BACKEND_WS, {
+  private jwt?: string;
+  async getJwt(backendRest: string, token: string) {
+    if (!this.jwt) {
+      const jwtResponse = await axios.post(`${backendRest}/plugins/${token}/token`);
+      this.jwt = jwtResponse.data.data;
+    }
+
+    return this.jwt;
+  }
+
+  constructor({ token, clientId, baseUrl, options }: ApiOptions) {
+    const backendWs = `${baseUrl}/clients`;
+    const backendRest = `${baseUrl}/v1`;
+
+    this.socket = io(backendWs, {
       path: SOCKET_PATH,
-      auth: {
-        token,
-      },
+      auth: cb => this.getJwt(backendRest, token).then(jwt => cb({ token: jwt })),
       query: {
         clientId,
       },
@@ -62,28 +73,47 @@ export default class API {
     this.socket.io.on('ping', sendMediaInfo);
 
     this.rest = axios.create({
-      baseURL: BACKEND_REST,
+      baseURL: backendRest,
       headers: {
-        Authorization: `Bearer ${token}`,
         'X-Client-Id': clientId,
         'Content-Type': 'application/json',
       },
+    });
+
+    this.rest.interceptors.request.use(async request => {
+      if (!request.headers?.Authorization) {
+        request.headers = {
+          ...request.headers,
+          Authorization: `Bearer ${await this.getJwt(backendRest, token)}`,
+        };
+      }
+      return request;
     });
 
     this.rest.interceptors.response.use(
       response => {
         return response.data;
       },
-      error => {
+      async error => {
+        const originalRequest = error.config;
+        if (error.response.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+          originalRequest.headers = {
+            ...originalRequest.headers,
+            Authorization: `Bearer ${await this.getJwt(backendRest, token)}`,
+          };
+          return this.rest?.(originalRequest);
+        }
+
         if (error.response) {
           return Promise.reject(error.response.data);
         }
+
         return Promise.reject(error);
       },
     );
 
     API.default = this;
-    setAPI(this);
   }
 
   async report(report: Report) {
