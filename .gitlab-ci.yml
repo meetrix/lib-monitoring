@@ -1,47 +1,191 @@
-package:
+variables:
+  HUSKY: '0'
+  SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
+  STAGING_SSH_USER: $STAGING_SSH_USER
+  STAGING_SSH_HOST: $STAGING_SSH_HOST
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+
+production_build:
+  image: node:12
   stage: build
-  image: node:12-bullseye-slim
+  environment:
+    name: production
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^v\d+\.\d+\.\d+.*$/
   script:
-    - apt update
-    - apt install -y bzip2 git
-    - git config --global credential.helper store
-    - echo "https://$GITLAB_DEPLOY_TOKEN_USER:$GITLAB_DEPLOY_TOKEN_PASSWORD@gitlab.com" > ~/.git-credentials
-    - npm install
+    # If no .npmrc is included in the repo, generate a temporary one that is configured to install from GitLab's NPM registry
+    - |
+      if [[ ! -f .npmrc ]]; then
+        echo 'No .npmrc found! Creating one now. Please review the following link for more information: https://docs.gitlab.com/ee/user/packages/npm_registry/index.html#project-level-npm-endpoint-1'
+        {
+          echo "@${CI_PROJECT_ROOT_NAMESPACE}:registry=${CI_API_V4_URL}/packages/npm/"
+          echo "${CI_API_V4_URL#http*:}/packages/npm/:_authToken=\${CI_JOB_TOKEN}"
+        } >> .npmrc
+      fi
+    - echo "Created the following .npmrc:"; cat .npmrc
+    # Build, using the cache if available
+    - CI=false npm ci --cache .npm --prefer-offline
     - cd node_modules/@peermetrics/webrtc-stats && npm install && npm run build
     - cd ../../.. && npm run build
-    - cd dist
-    - tar -cjSf lib-monitoring.tar.bz2 *
   artifacts:
     paths:
-      - dist/lib-monitoring.tar.bz2
-  only:
-    - master
-    - tags
+      - dist
 
-before_script:
-  - mkdir -p ~/.ssh
-  - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-  - chmod 600 ~/.ssh/id_rsa
-  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-
-staging_deploy:
+production_publish:
+  image: node:12
   stage: deploy
-  image: kroniak/ssh-client
   environment:
-    name: staging
+    name: production
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^v\d+\.\d+\.\d+.*$/
+      changes:
+        - package.json
   script:
+    # If no .npmrc is included in the repo, generate a temporary one that is configured to publish to GitLab's NPM registry
+    # NOTE: This is different from the instance registry .npmrc and has /projects/${CI_PROJECT_ID}
+    - |
+      if [[ ! -f .npmrc ]]; then
+        echo 'No .npmrc found! Creating one now. Please review the following link for more information: https://docs.gitlab.com/ee/user/packages/npm_registry/index.html#project-level-npm-endpoint-1'
+        {
+          echo "@${CI_PROJECT_ROOT_NAMESPACE}:registry=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/npm/"
+          echo "${CI_API_V4_URL#http*:}/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=\${CI_JOB_TOKEN}"
+        } >> .npmrc
+      fi
+    - echo "Created the following .npmrc:"; cat .npmrc
+
+    # Extract a few values from package.json
+    - NPM_PACKAGE_NAME=$(node -p "require('./package.json').name")
+    - NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+    # Validate that the package name is properly scoped to the instance namespace.
+    # For more information, see https://docs.gitlab.com/ee/user/packages/npm_registry/#package-naming-convention
+    - |
+      if [[ ! $NPM_PACKAGE_NAME =~ ^@$CI_PROJECT_ROOT_NAMESPACE/ ]]; then
+        echo "Invalid package scope! Packages must be scoped in the root namespace of the project, e.g. \"@${CI_PROJECT_ROOT_NAMESPACE}/${CI_PROJECT_NAME}\""
+        echo 'For more information, see https://docs.gitlab.com/ee/user/packages/npm_registry/#package-naming-convention'
+        exit 1
+      fi
+
+    # Compare the version in package.json to all published versions.
+    # If the package.json version has not yet been published, run `npm publish`.
+    - |
+      if [[ $(npm view "${NPM_PACKAGE_NAME}" versions) != *"'${NPM_PACKAGE_VERSION}'"* ]]; then
+        npm --verbose publish
+        echo "Successfully published version ${NPM_PACKAGE_VERSION} of ${NPM_PACKAGE_NAME} to GitLab's NPM registry: ${CI_PROJECT_URL}/-/packages"
+      else
+        echo "Version ${NPM_PACKAGE_VERSION} of ${NPM_PACKAGE_NAME} has already been published, so no new version has been published."
+      fi
+
+production_deploy:
+  image: kroniak/ssh-client
+  stage: deploy
+  environment:
+    name: production
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /^v\d+\.\d+\.\d+.*$/
+      when: never
+  cache: {} # disable
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - cd dist && tar -cjf lib-monitoring.tar.bz2 * && cd ..
     - scp -o StrictHostKeyChecking=no dist/lib-monitoring.tar.bz2 $STAGING_SSH_USER@$STAGING_SSH_HOST:/var/www/lib-monitoring/releases/
     - ssh $STAGING_SSH_USER@$STAGING_SSH_HOST "cd /var/www/lib-monitoring/releases && mkdir $CI_PIPELINE_ID && tar -xf lib-monitoring.tar.bz2 -C $CI_PIPELINE_ID"
     - ssh $STAGING_SSH_USER@$STAGING_SSH_HOST "cd /var/www/lib-monitoring && ln -sfn releases/$CI_PIPELINE_ID current"
-  only:
-    - master
 
-production_deploy:
-  stage: deploy
-  image: kroniak/ssh-client
+branch_build:
+  image: node:12
+  stage: build
   environment:
-    name: production
+    name: staging
+  rules: # on master automatically, or on branch manually
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+    - if: $CI_COMMIT_BRANCH
+      when: manual
   script:
-    - echo dummy echo
-  only:
-    - tags
+    # If no .npmrc is included in the repo, generate a temporary one that is configured to install from GitLab's NPM registry
+    - |
+      if [[ ! -f .npmrc ]]; then
+        echo 'No .npmrc found! Creating one now. Please review the following link for more information: https://docs.gitlab.com/ee/user/packages/npm_registry/index.html#project-level-npm-endpoint-1'
+        {
+          echo "@${CI_PROJECT_ROOT_NAMESPACE}:registry=${CI_API_V4_URL}/packages/npm/"
+          echo "${CI_API_V4_URL#http*:}/packages/npm/:_authToken=\${CI_JOB_TOKEN}"
+        } >> .npmrc
+      fi
+    - echo "Created the following .npmrc:"; cat .npmrc
+    # Build, using the cache if available
+    - CI=false npm ci --cache .npm --prefer-offline
+    - cd node_modules/@peermetrics/webrtc-stats && npm install && npm run build
+    - cd ../../.. && npm run build
+  artifacts:
+    paths:
+      - dist
+
+branch_publish:
+  image: node:12
+  stage: deploy
+  environment:
+    name: staging
+  rules:
+    - if: $CI_COMMIT_BRANCH
+  script:
+    # If no .npmrc is included in the repo, generate a temporary one that is configured to publish to GitLab's NPM registry
+    # NOTE: This is different from the instance registry .npmrc and has /projects/${CI_PROJECT_ID}
+    - |
+      if [[ ! -f .npmrc ]]; then
+        echo 'No .npmrc found! Creating one now. Please review the following link for more information: https://docs.gitlab.com/ee/user/packages/npm_registry/index.html#project-level-npm-endpoint-1'
+        {
+          echo "@${CI_PROJECT_ROOT_NAMESPACE}:registry=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/npm/"
+          echo "${CI_API_V4_URL#http*:}/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=\${CI_JOB_TOKEN}"
+        } >> .npmrc
+      fi
+    - echo "Created the following .npmrc:"; cat .npmrc
+    - NPM_PACKAGE_NAME=$(node -p "require('./package.json').name")
+
+    # Validate that the package name is properly scoped to the instance namespace.
+    # For more information, see https://docs.gitlab.com/ee/user/packages/npm_registry/#package-naming-convention
+    - |
+      if [[ ! $NPM_PACKAGE_NAME =~ ^@$CI_PROJECT_ROOT_NAMESPACE/ ]]; then
+        echo "Invalid package scope! Packages must be scoped in the root namespace of the project, e.g. \"@${CI_PROJECT_ROOT_NAMESPACE}/${CI_PROJECT_NAME}\""
+        echo 'For more information, see https://docs.gitlab.com/ee/user/packages/npm_registry/#package-naming-convention'
+        exit 1
+      fi
+
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - npm version prerelease --preid=$CI_COMMIT_SHORT_SHA
+    - NPM_PACKAGE_VERSION=$(node -p "require('./package.json').version")
+    # Compare the version in package.json to all published versions.
+    # If the package.json version has not yet been published, run `npm publish`.
+    - echo Publishing $NPM_PACKAGE_NAME@$NPM_PACKAGE_VERSION a.k.a. $NPM_PACKAGE_NAME@$CI_COMMIT_REF_SLUG
+    - npm --verbose publish --tag $CI_COMMIT_REF_SLUG
+
+branch_deploy:
+  image: kroniak/ssh-client
+  stage: deploy
+  environment:
+    name: staging
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+  cache: {} # disable
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - cd dist && tar -cjf lib-monitoring.tar.bz2 * && cd ..
+    - scp -o StrictHostKeyChecking=no dist/lib-monitoring.tar.bz2 $STAGING_SSH_USER@$STAGING_SSH_HOST:/var/www/lib-monitoring/releases/
+    - ssh $STAGING_SSH_USER@$STAGING_SSH_HOST "cd /var/www/lib-monitoring/releases && mkdir $CI_PIPELINE_ID && tar -xf lib-monitoring.tar.bz2 -C $CI_PIPELINE_ID"
+    - ssh $STAGING_SSH_USER@$STAGING_SSH_HOST "cd /var/www/lib-monitoring && ln -sfn releases/$CI_PIPELINE_ID current"
