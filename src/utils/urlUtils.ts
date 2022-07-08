@@ -6,6 +6,7 @@ export interface URLParametersType {
   troubleshooterMock?: { [key: string]: string };
   troubleshooterOnly?: string[];
   clientId?: string | undefined;
+  email?: string | undefined;
 }
 
 // TODO: `qs` throws this error -> util is undefined. Needs fixing. Mocking for now
@@ -33,6 +34,7 @@ export const getUrlParams = (
     ),
     troubleshooterOnly: commaSeparatedList(searchParams.get('troubleshooterOnly') || undefined),
     clientId: searchParams.get('clientId') || undefined,
+    email: searchParams.get('email') || undefined,
   };
 };
 
