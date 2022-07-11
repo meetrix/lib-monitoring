@@ -14,7 +14,7 @@ The tests run on `node` environment instead of the real browser environment. Bec
 2. Run the below commands (sets config for the current user; use a `-g` after `set` to set for all users)
 
    ```sh
-   npm config set @meetrix:registry https://gitlab.com/api/v4/packages/npm/
+   npm config set '@meetrix:registry' https://gitlab.com/api/v4/packages/npm/
    npm config set -- '//gitlab.com/api/v4/packages/npm/:_authToken' "<your_token>"
    ```
 
