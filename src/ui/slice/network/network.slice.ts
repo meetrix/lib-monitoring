@@ -26,9 +26,9 @@ const initialState: INetworkTestState = {
   status: '',
   subOrder: ['udp', 'tcp', 'ipv6'],
   subMessages: {
-    udp: ['[ INFO ] Test not run yet.'],
-    tcp: ['[ INFO ] Test not run yet.'],
-    ipv6: ['[ INFO ] Test not run yet.'],
+    udp: ['[ INFO ] Test not run yet.'], // Only the first of the first should show
+    tcp: [],
+    ipv6: [],
   },
   subStatus: {
     udp: '',

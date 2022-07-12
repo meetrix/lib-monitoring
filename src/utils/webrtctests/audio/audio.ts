@@ -22,8 +22,8 @@ const bufferSize = 0;
 // Turning off echoCancellation constraint enables stereo input.
 const constraints = {
   audio: {
-    echoCancellation: false
-  }
+    echoCancellation: false,
+  },
 };
 
 const collectSeconds = 2.0;
@@ -45,7 +45,14 @@ for (let i = 0; i < inputChannelCount; i += 1) {
 }
 // const AudioContext = window.AudioContext || window.webkitAudioContext;
 const { AudioContext } = window;
-const audioContext = new AudioContext();
+let audioContext: AudioContext;
+const getAudioContext = () => {
+  if (!audioContext) {
+    audioContext = new AudioContext();
+  }
+
+  return audioContext;
+};
 let aStream: any;
 let audioSource: any;
 let scriptNode: any;
@@ -57,7 +64,7 @@ const runMicTest = async (callback: TestEventCallback): Promise<boolean> => {
   report(TestEvent.START, '');
 
   try {
-    await audioContext.resume();
+    await getAudioContext().resume();
     aStream = await doGetUserMedia(constraints);
     await gotStream();
   } catch (error) {
@@ -90,14 +97,14 @@ const checkAudioTracks = async () => {
 
 const createAudioBuffer = async () => {
   debug('createAudioBuffer()');
-  audioSource = await audioContext.createMediaStreamSource(aStream);
-  scriptNode = await audioContext.createScriptProcessor(
+  audioSource = await getAudioContext().createMediaStreamSource(aStream);
+  scriptNode = await getAudioContext().createScriptProcessor(
     bufferSize,
     inputChannelCount,
-    outputChannelCount
+    outputChannelCount,
   );
   await audioSource.connect(scriptNode);
-  await scriptNode.connect(audioContext.destination);
+  await scriptNode.connect(getAudioContext().destination);
   scriptNode.onaudioprocess = collectAudio;
   await setTimeoutWithProgressBar(5000);
   await onStopCollectingAudio();
@@ -153,7 +160,7 @@ const onStopCollectingAudio = async () => {
   debug('onStopCollectingAudio()');
   await aStream.getAudioTracks()[0].stop();
   await audioSource.disconnect(scriptNode);
-  await scriptNode.disconnect(audioContext.destination);
+  await scriptNode.disconnect(getAudioContext().destination);
   await analyzeAudio(collectedAudio);
   report(TestEvent.END, 'success');
 };
@@ -171,7 +178,7 @@ const analyzeAudio = (channels: string | any[]) => {
       TestEvent.MESSAGE,
       '[ FAILED ] No active input channels detected. Microphone ' +
         'is most likely muted or broken, please check if muted in the ' +
-        'sound settings or physically on the device. Then rerun the test.'
+        'sound settings or physically on the device. Then rerun the test.',
     );
   } else {
     report(TestEvent.MESSAGE, `[ OK ] Active audio input channels: ${activeChannels.length}`);
@@ -217,21 +224,21 @@ const channelStats = (channelNumber: any, buffers: string | any[]) => {
     report(
       TestEvent.MESSAGE,
       `[ INFO ] Channel ${channelNumber} levels: ${dBPeak.toFixed(1)} dB (peak), ${dBRms.toFixed(
-        1
-      )} dB (RMS)`
+        1,
+      )} dB (RMS)`,
     );
     if (dBRms < lowVolumeThreshold) {
       report(
         TestEvent.MESSAGE,
         '[ FAILED ] Microphone input level is low, increase input ' +
-          'volume or move closer to the microphone.'
+          'volume or move closer to the microphone.',
       );
     }
     if (maxClipCount > clipCountThreshold) {
       report(
         TestEvent.MESSAGE,
         '[ WARN ] Clipping detected! Microphone input level ' +
-          'is high. Decrease input volume or move away from the microphone.'
+          'is high. Decrease input volume or move away from the microphone.',
       );
     }
     return true;

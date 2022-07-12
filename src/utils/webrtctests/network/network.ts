@@ -22,6 +22,8 @@ let type: string;
 let report: TestEventCallback;
 let CallClass: Call;
 
+const testPassed: { [x: string]: boolean } = {};
+
 const initNetworkTest = async (
   callback: TestEventCallback,
   protocolArg: string,
@@ -107,6 +109,7 @@ const gatherCandidates = async (config: any): Promise<boolean> => {
     }
 
     report(TestEvent.END, [type, 'failure']);
+    testPassed[type] = false;
     return false;
   }
 
@@ -130,6 +133,7 @@ const gatherCandidates = async (config: any): Promise<boolean> => {
           pc.close();
           // = null;
           report(TestEvent.END, [type, 'success']);
+          testPassed[type] = true;
           resolve(true);
           return;
         }
@@ -147,6 +151,7 @@ const gatherCandidates = async (config: any): Promise<boolean> => {
           report(TestEvent.MESSAGE, [type, '[ FAILED ] Failed to gather specified candidates']);
         }
         report(TestEvent.END, [type, 'failure']);
+        testPassed[type] = false;
         resolve(false);
       }
     });
@@ -173,6 +178,8 @@ const sleep = (time: number): Promise<void> => {
 };
 
 const runNetworkTests = async (callback: TestEventCallback): Promise<boolean> => {
+  console.log('Network tests started');
+
   await sleep(1000);
   debug(Date.now());
 
@@ -197,7 +204,30 @@ const runNetworkTests = async (callback: TestEventCallback): Promise<boolean> =>
   await sleep(5000);
   debug(Date.now());
 
-  return [udp, tcp, ipv6].every(Boolean);
+  let failure = false;
+  setTimeout(() => {
+    // Disable report function for other running code
+    report = () => {};
+    if (testPassed['udp'] === undefined) {
+      callback(TestEvent.END, ['udp', 'failure']);
+      callback(TestEvent.MESSAGE, ['udp', `[ FAILED ] Timed out`]);
+    }
+    if (testPassed['tcp'] === undefined) {
+      callback(TestEvent.END, ['tcp', 'failure']);
+      callback(TestEvent.MESSAGE, ['tcp', `[ FAILED ] Timed out`]);
+    }
+    if (testPassed['ipv6'] === undefined) {
+      callback(TestEvent.END, ['ipv6', 'failure']);
+      callback(TestEvent.MESSAGE, ['ipv6', `[ FAILED ] Timed out`]);
+    }
+    failure = !testPassed['ipv6'] || !testPassed['reflexive'] || !testPassed['host'];
+  }, 15 * 1000);
+  await sleep(15 * 1000);
+
+  // XXX: Tests could still be running in the background although they are timed out
+  console.log('Network tests done');
+
+  return !failure;
 };
 
 export default runNetworkTests;

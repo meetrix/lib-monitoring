@@ -23,6 +23,8 @@ let report: TestEventCallback;
 let CallClass: Call;
 let iceCandidateFilter: any;
 
+const testPassed: { [x: string]: boolean } = {};
+
 const initConnectionTest = async (
   callback: TestEventCallback,
   iceCandidateFilterArg: any,
@@ -88,7 +90,7 @@ const start = async (config: RTCConfiguration) => {
   });
 
   await CallClass.establishConnection();
-  timeout = setTimeout(hangup.bind(this, 'Timed out'), 5000);
+  timeout = setTimeout(hangup.bind(this, 'Timed out'), 10000);
 };
 
 const findParsedCandidateOfSpecifiedType = (candidateTypeMethod: any): boolean => {
@@ -118,8 +120,10 @@ const hangup = async (errorMessage: string) => {
       report(TestEvent.MESSAGE, [type, `[ FAILED ] ${errorMessage}`]);
     }
     report(TestEvent.END, [type, 'failure']);
+    testPassed[type] = false;
   } else {
     report(TestEvent.END, [type, 'success']);
+    testPassed[type] = true;
   }
   clearTimeout(timeout);
   CallClass.close();
@@ -132,6 +136,8 @@ const sleep = (time: number): Promise<void> => {
 };
 
 const runConnectionTests = async (callback: TestEventCallback): Promise<boolean> => {
+  console.log('Connection tests started');
+
   const CallClass2 = new Call({});
   await sleep(1000);
   debug(Date.now());
@@ -156,7 +162,29 @@ const runConnectionTests = async (callback: TestEventCallback): Promise<boolean>
 
   // return relay && reflexive && host;
   // TODO: Properly track test flow and return the correct result
-  return true;
+  let failure = false;
+  setTimeout(() => {
+    // Disable report function for other running code
+    report = () => {};
+    if (testPassed['relay'] === undefined) {
+      callback(TestEvent.END, ['relay', 'failure']);
+      callback(TestEvent.MESSAGE, ['relay', `[ FAILED ] Timed out`]);
+    }
+    if (testPassed['reflexive'] === undefined) {
+      callback(TestEvent.END, ['reflexive', 'failure']);
+      callback(TestEvent.MESSAGE, ['reflexive', `[ FAILED ] Timed out`]);
+    }
+    if (testPassed['host'] === undefined) {
+      callback(TestEvent.END, ['host', 'failure']);
+      callback(TestEvent.MESSAGE, ['host', `[ FAILED ] Timed out`]);
+    }
+    failure = !testPassed['relay'] || !testPassed['reflexive'] || !testPassed['host'];
+  }, 1 * 60 * 1000);
+  await sleep(1 * 60 * 1000);
+
+  console.log('Connection tests done');
+
+  return !failure;
 };
 
 export default runConnectionTests;

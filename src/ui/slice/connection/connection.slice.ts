@@ -26,9 +26,9 @@ const initialState: IConnectionTestState = {
   status: '',
   subOrder: ['relay', 'reflexive', 'host'],
   subMessages: {
-    relay: ['[ INFO ] Test not run yet.'],
-    reflexive: ['[ INFO ] Test not run yet.'],
-    host: ['[ INFO ] Test not run yet.'],
+    relay: [],
+    reflexive: [],
+    host: [],
   },
   subStatus: {
     relay: '',
