@@ -45,6 +45,19 @@ export const browserSlice = createSlice({
       state.status = action.payload;
     },
   },
+  extraReducers(builder) {
+    builder.addCase('troubleshooter/clear', (state, action) => {
+      state.status = '';
+      state.subOrder = ['default'];
+      state.subMessages = {
+        default: ['[ INFO ] Test not run yet.'],
+      };
+      state.subStatus = {
+        default: '',
+      };
+      state.message = '';
+    });
+  },
 });
 
 export const { actions: browserActions } = browserSlice;

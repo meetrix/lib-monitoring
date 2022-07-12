@@ -98,6 +98,23 @@ export const networkSlice = createSlice({
       state.status = deriveOverallStatus(subStatuses);
     },
   },
+  extraReducers(builder) {
+    builder.addCase('troubleshooter/clear', (state, action) => {
+      state.status = '';
+      state.subOrder = ['udp', 'tcp', 'ipv6'];
+      state.subMessages = {
+        udp: ['[ INFO ] Test not run yet.'], // Only the first of the first should show
+        tcp: [],
+        ipv6: [],
+      };
+      state.subStatus = {
+        udp: '',
+        tcp: '',
+        ipv6: '',
+      };
+      state.message = '';
+    });
+  },
 });
 
 export const { actions: networkActions } = networkSlice;

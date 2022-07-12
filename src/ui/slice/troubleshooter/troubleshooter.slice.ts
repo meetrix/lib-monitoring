@@ -20,7 +20,11 @@ export const troubleshooterSlice = createSlice({
   name: 'troubleshooter',
   initialState,
   reducers: {
-    submitResponse(state, action) {},
+    clear(state) {
+      state.status = '';
+      state.error = null;
+      state.data = null;
+    },
   },
   extraReducers(builder) {
     builder.addCase(submitTroubleshooterSession.pending, (state, action) => {

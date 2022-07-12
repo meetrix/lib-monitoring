@@ -83,6 +83,21 @@ export const bandwidthSlice = createSlice({
       state.status = deriveOverallStatus(subStatuses);
     },
   },
+  extraReducers(builder) {
+    builder.addCase('troubleshooter/clear', (state, action) => {
+      state.status = '';
+      state.subOrder = ['throughput', 'videoBandwidth'];
+      state.subMessages = {
+        throughput: [''],
+        videoBandwidth: [''],
+      };
+      state.subStatus = {
+        throughput: '',
+        videoBandwidth: '',
+      };
+      state.message = '';
+    });
+  },
 });
 
 export const { actions: bandwidthActions } = bandwidthSlice;

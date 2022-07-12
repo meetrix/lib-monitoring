@@ -98,6 +98,23 @@ export const connectionSlice = createSlice({
       state.status = deriveOverallStatus(subStatuses);
     },
   },
+  extraReducers(builder) {
+    builder.addCase('troubleshooter/clear', (state, action) => {
+      state.status = '';
+      state.subOrder = ['relay', 'reflexive', 'host'];
+      state.subMessages = {
+        relay: [],
+        reflexive: [],
+        host: [],
+      };
+      state.subStatus = {
+        relay: '',
+        reflexive: '',
+        host: '',
+      };
+      state.message = '';
+    });
+  },
 });
 
 export const { actions: connectionActions } = connectionSlice;

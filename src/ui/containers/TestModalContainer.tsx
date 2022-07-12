@@ -13,6 +13,7 @@ import { bandwidthActions, selectBandwidth } from '../slice/bandwidth/bandwidth.
 import {
   selectTroubleshooter,
   submitTroubleshooterSession,
+  troubleshooterActions,
 } from '../slice/troubleshooter/troubleshooter.slice';
 import { TestEvent, TestEventCallback } from '../../utils/webrtctests/TestEvent';
 import { testBrowser, testCamera, testMicrophone, testNetwork } from '../../utils/webrtctests';
@@ -152,6 +153,7 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
   };
 
   const handleStart = async () => {
+    dispatch(troubleshooterActions.clear());
     setEmailEntered(true);
 
     const browserResult = shouldRunTest('browser')
