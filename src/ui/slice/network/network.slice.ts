@@ -26,9 +26,9 @@ const initialState: INetworkTestState = {
   status: '',
   subOrder: ['udp', 'tcp', 'ipv6'],
   subMessages: {
-    udp: ['[ INFO ] Test not run yet.'],
-    tcp: ['[ INFO ] Test not run yet.'],
-    ipv6: ['[ INFO ] Test not run yet.'],
+    udp: ['[ INFO ] Test not run yet.'], // Only the first of the first should show
+    tcp: [],
+    ipv6: [],
   },
   subStatus: {
     udp: '',
@@ -97,6 +97,23 @@ export const networkSlice = createSlice({
       const subStatuses = [state.subStatus.udp, state.subStatus.tcp, state.subStatus.ipv6];
       state.status = deriveOverallStatus(subStatuses);
     },
+  },
+  extraReducers(builder) {
+    builder.addCase('troubleshooter/clear', (state, action) => {
+      state.status = '';
+      state.subOrder = ['udp', 'tcp', 'ipv6'];
+      state.subMessages = {
+        udp: ['[ INFO ] Test not run yet.'], // Only the first of the first should show
+        tcp: [],
+        ipv6: [],
+      };
+      state.subStatus = {
+        udp: '',
+        tcp: '',
+        ipv6: '',
+      };
+      state.message = '';
+    });
   },
 });
 

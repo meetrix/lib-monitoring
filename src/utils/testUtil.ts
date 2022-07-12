@@ -455,8 +455,11 @@ export const asyncCreateTurnConfigDefault = (): RTCConfiguration => {
 };
 
 const fetchTurnConfigCached = memoize(
-  async (): Promise<RTCConfiguration> =>
-    (await API.default.rest?.get('/plugins/ice-servers'))?.data,
+  async (): Promise<RTCConfiguration> => {
+    const response = await API.default.rest?.get('/plugins/ice-servers');
+
+    return !response || !(response as any)?.success ? null : response?.data;
+  },
   () => Math.ceil(Date.now() / 1000 / 60),
 );
 

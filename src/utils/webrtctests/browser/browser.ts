@@ -67,7 +67,7 @@ const runBrowserTests = async (callback: TestEventCallback): Promise<boolean> =>
     report(...message`Record/process remote audio ${isRemoteStreamProcessingSupported}`);
     report(...message`WebSockets ${isWebSocketsSupported}`);
     // report(...message`WebSockets not blocked ${!isWebSocketsBlocked}`);
-    report(...message`WebAudio API ${isAudioContextSupported}`);
+    // report(...message`WebAudio API ${isAudioContextSupported}`);
     report(...message`SCTP data channels ${isSctpDataChannelsSupported}`);
     report(...message`RTP data channels ${isRtpDataChannelsSupported}`);
     report(...message`Screen capturing ${isScreenCapturingSupported}`);
@@ -87,8 +87,8 @@ const runBrowserTests = async (callback: TestEventCallback): Promise<boolean> =>
       hasSpeakers,
       hasMicrophone,
       hasWebcam,
-      isWebsiteHasMicrophonePermissions,
-      isWebsiteHasWebcamPermissions,
+      // isWebsiteHasMicrophonePermissions,
+      // isWebsiteHasWebcamPermissions,
       isWebRTCSupported,
     ];
     if (mandatory.some(x => !x)) {

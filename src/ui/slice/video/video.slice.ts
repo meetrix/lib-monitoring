@@ -109,6 +109,25 @@ export const videoSlice = createSlice({
       }
     },
   },
+  extraReducers(builder) {
+    builder.addCase('troubleshooter/clear', (state, action) => {
+      state.status = '';
+      state.subOrder = ['p240', 'p480', 'p720', 'generic'];
+      state.subMessages = {
+        p240: ['[ INFO ] Test not run yet.'],
+        p480: ['[ INFO ] Test not run yet.'],
+        p720: ['[ INFO ] Test not run yet.'],
+        generic: ['[ INFO ] Test not run yet.'],
+      };
+      state.subStatus = {
+        p240: '',
+        p480: '',
+        p720: '',
+        generic: '',
+      };
+      state.message = '';
+    });
+  },
 });
 
 export const { actions: videoActions } = videoSlice;

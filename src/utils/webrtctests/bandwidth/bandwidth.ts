@@ -31,6 +31,9 @@ let stopSending = false;
 let samplePacket = '';
 let report: TestEventCallback;
 
+let throughputPassed = false;
+let videoBandwidthPassed = false;
+
 for (let i = 0; i !== 1024; i += 1) {
   samplePacket += 'h';
 }
@@ -128,6 +131,7 @@ const onMessageReceived = async (event: MessageEvent) => {
       `[ OK ] Total transmitted: ${receivedKBits} kilo-bits in ${elapsedTime} seconds.`,
     ]);
     report(TestEvent.END, ['throughput', 'success']);
+    throughputPassed = true;
   }
 };
 
@@ -329,6 +333,7 @@ const gotStats = (response: any, time: any, response2: any, time2: any) => {
   report(TestEvent.MESSAGE, ['videoBandwidth', `[ INFO ] RTT max: ${rttStats.getMax()} ms`]);
   report(TestEvent.MESSAGE, ['videoBandwidth', `[ INFO ] Packets lost: ${packetsLost}`]);
   report(TestEvent.END, ['videoBandwidth', 'success']);
+  videoBandwidthPassed = true;
 };
 
 const hangup = async () => {
@@ -350,19 +355,21 @@ const sleep = (time: number): Promise<void> => {
 };
 
 const runBandwidthTests = async (callback: TestEventCallback): Promise<boolean> => {
+  console.log('Bandwidth tests started');
+
   await sleep(1000);
   debug(Date.now());
   // Set up a datachannel between two peers through a relay
   // and verify data can be transmitted and received
   // (packets travel through the public internet)
   await initBandwidthTestThroughput(callback);
-  await sleep(5000);
+  await sleep(15_000);
   debug(Date.now());
   // Set up a datachannel between two peers through a public IP address
   // and verify data can be transmitted and received
   // (packets should stay on the link if behind a router doing NAT)
   await initBandwidthTestVideoBandwidth(callback);
-  await sleep(1000);
+  await sleep(15_000);
 
   // Uncomment when testing
   // callback(TestEvent.START, 'throughput');
@@ -373,7 +380,26 @@ const runBandwidthTests = async (callback: TestEventCallback): Promise<boolean> 
   // await sleep(2000);
   // callback(TestEvent.END, ['videoBandwidth', 'success']);
 
-  return true; // TODO: Return proper status
+  let failure = false;
+  setTimeout(() => {
+    // Disable report function for other running code
+    report = () => {};
+    if (!throughputPassed) {
+      callback(TestEvent.END, ['throughput', 'failure']);
+      callback(TestEvent.MESSAGE, ['throughput', `[ FAILED ] Timed out`]);
+    }
+    if (!videoBandwidthPassed) {
+      callback(TestEvent.END, ['videoBandwidth', 'failure']);
+      callback(TestEvent.MESSAGE, ['videoBandwidth', `[ FAILED ] Timed out`]);
+    }
+    failure = !throughputPassed || !videoBandwidthPassed;
+  }, 1 * 60 * 1000);
+  await sleep(1 * 60 * 1000);
+
+  // XXX: Tests could still be running in the background although they are timed out
+  console.log('Bandwidth tests done');
+
+  return !failure;
 };
 
 export default runBandwidthTests;

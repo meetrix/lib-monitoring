@@ -49,7 +49,7 @@ export interface TestModalProps extends WithStyles<ButtonProps & typeof styles> 
   onRetry?: () => void;
 }
 
-function deriveStatus(data: ITestView[]) {
+function deriveStatus(data: ITestView[], testId?: string) {
   const status = data.every(({ status }) => status === 'success')
     ? 'success'
     : data.every(({ status }) => status === '')
@@ -64,8 +64,9 @@ function deriveStatus(data: ITestView[]) {
       statusMessage = 'All tests passed';
       break;
     case 'failure':
-      statusMessage =
-        'Unfortunately you can’t make video calls through this browser, and your devices is not compatible.';
+      statusMessage = testId
+        ? 'Unfortunately you can’t make video calls through this browser, and your devices is not compatible.'
+        : 'Waiting';
       break;
     case 'running':
       statusMessage = 'Running tests';
@@ -99,7 +100,7 @@ export const TestModal: React.FC<TestModalProps> = ({
   onRetry: handleRetry,
   ...otherProps
 }: TestModalProps) => {
-  const { status, statusMessage } = deriveStatus(data);
+  const { status, statusMessage } = deriveStatus(data, testId);
 
   useEffect(() => {
     if (open && status === '') {
@@ -142,7 +143,7 @@ export const TestModal: React.FC<TestModalProps> = ({
           <Typography id="test-modal-title" variant="caption" color="darkgray">
             {testId && `TEST ID: ${testId}`}
           </Typography>
-          <Button disabled={status === 'running'} onClick={handleRetry}>
+          <Button disabled={!testId} onClick={handleRetry}>
             Test again
           </Button>
         </div>

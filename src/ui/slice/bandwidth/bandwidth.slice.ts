@@ -22,10 +22,10 @@ export interface IBandwidthTestState extends ITestState {
 
 const initialState: IBandwidthTestState = {
   status: '',
-  subOrder: ['throughput', 'bandwidth'],
+  subOrder: ['throughput', 'videoBandwidth'],
   subMessages: {
-    throughput: ['[ INFO ] Test not run yet.'],
-    videoBandwidth: ['[ INFO ] Test not run yet.'],
+    throughput: [''],
+    videoBandwidth: [''],
   },
   subStatus: {
     throughput: '',
@@ -67,6 +67,8 @@ export const bandwidthSlice = createSlice({
       state.status = deriveOverallStatus(subStatuses);
     },
     endTest(state, action) {
+      console.log('bandwidth', action);
+
       switch (action.payload[0]) {
         case 'throughput':
           state.subStatus.throughput = action.payload[1];
@@ -80,6 +82,21 @@ export const bandwidthSlice = createSlice({
       const subStatuses = [state.subStatus.throughput, state.subStatus.videoBandwidth];
       state.status = deriveOverallStatus(subStatuses);
     },
+  },
+  extraReducers(builder) {
+    builder.addCase('troubleshooter/clear', (state, action) => {
+      state.status = '';
+      state.subOrder = ['throughput', 'videoBandwidth'];
+      state.subMessages = {
+        throughput: [''],
+        videoBandwidth: [''],
+      };
+      state.subStatus = {
+        throughput: '',
+        videoBandwidth: '',
+      };
+      state.message = '';
+    });
   },
 });
 

@@ -123,7 +123,7 @@ const SetupModal = (props: SetupModalProps) => {
           <Button 
             variant='contained' 
             disableElevation 
-            disabled={!props.email.includes('@')} 
+            disabled={!props.email.match(/^(.+)@(.+)$/) } 
             onClick={props.onStart} 
             className={props.classes.startButton}
           >
