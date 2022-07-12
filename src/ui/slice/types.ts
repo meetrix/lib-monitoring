@@ -5,14 +5,14 @@ export const subComponents = {
   microphone: ['default'],
   camera: ['p240', 'p480', 'p720', 'generic'],
   network: [
-    'connection-relay',
-    'connection-reflexive',
-    'connection-host',
     'network-udp',
     'network-tcp',
     'network-ipv6',
+    'connection-relay',
+    'connection-reflexive',
+    'connection-host',
     'bandwidth-throughput',
-    'bandwidth-bandwidth',
+    'bandwidth-videoBandwidth',
   ],
 } as const;
 

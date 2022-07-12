@@ -26,9 +26,9 @@ const initialState: IConnectionTestState = {
   status: '',
   subOrder: ['relay', 'reflexive', 'host'],
   subMessages: {
-    relay: ['[ INFO ] Test not run yet.'],
-    reflexive: ['[ INFO ] Test not run yet.'],
-    host: ['[ INFO ] Test not run yet.'],
+    relay: [],
+    reflexive: [],
+    host: [],
   },
   subStatus: {
     relay: '',
@@ -97,6 +97,23 @@ export const connectionSlice = createSlice({
       const subStatuses = [state.subStatus.relay, state.subStatus.reflexive, state.subStatus.host];
       state.status = deriveOverallStatus(subStatuses);
     },
+  },
+  extraReducers(builder) {
+    builder.addCase('troubleshooter/clear', (state, action) => {
+      state.status = '';
+      state.subOrder = ['relay', 'reflexive', 'host'];
+      state.subMessages = {
+        relay: [],
+        reflexive: [],
+        host: [],
+      };
+      state.subStatus = {
+        relay: '',
+        reflexive: '',
+        host: '',
+      };
+      state.message = '';
+    });
   },
 });
 

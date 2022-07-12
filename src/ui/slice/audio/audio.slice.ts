@@ -45,6 +45,15 @@ export const audioSlice = createSlice({
           : ' [ FAILED ] Tests failed';
     },
   },
+  extraReducers(builder) {
+    builder.addCase('troubleshooter/clear', (state, action) => {
+      state.status = '';
+      state.subOrder = ['default'];
+      state.subMessages = { default: ['[ INFO ] Test not run yet.'] };
+      state.subStatus = { default: '' };
+      state.message = '';
+    });
+  },
 });
 
 export const { actions: audioActions } = audioSlice;

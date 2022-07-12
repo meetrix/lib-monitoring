@@ -13,6 +13,7 @@ import { bandwidthActions, selectBandwidth } from '../slice/bandwidth/bandwidth.
 import {
   selectTroubleshooter,
   submitTroubleshooterSession,
+  troubleshooterActions,
 } from '../slice/troubleshooter/troubleshooter.slice';
 import { TestEvent, TestEventCallback } from '../../utils/webrtctests/TestEvent';
 import { testBrowser, testCamera, testMicrophone, testNetwork } from '../../utils/webrtctests';
@@ -36,13 +37,15 @@ const useStatus = () => {
   ];
   const overallNetworkStatus = deriveOverallStatus(subNetworkStatuses);
 
-  const overallNetworkError = [
+  const overallNetworkMessage = [
     networkStatus.message,
     connectionStatus.message,
     bandwidthStatus.message,
   ]
     .filter(Boolean)
-    .join(', ');
+    .pop();
+
+  console.log('overallNetworkMessage', overallNetworkMessage);
 
   const overallSubMessages = {
     'network-udp': networkStatus.subMessages.udp,
@@ -86,7 +89,12 @@ const useStatus = () => {
       subOrder: [...subComponents[components[3]]],
       label: 'Checking your network connection',
       status: overallNetworkStatus,
-      message: overallNetworkError,
+      message:
+        overallNetworkStatus === 'failure'
+          ? '[ FAILED ] There were some errors'
+          : overallNetworkStatus === 'success'
+          ? '[ OK ] Tests were successful'
+          : overallNetworkMessage,
       subMessages: overallSubMessages,
       subStatus: overallSubStatus,
     },
@@ -118,6 +126,8 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
   const [email, setEmail] = useState('');
   const [emailEntered, setEmailEntered] = useState(false);
 
+  console.log('>>>', status);
+
   useEffect(() => {
     setEmail(autofillEmail || '');
   }, [autofillEmail]);
@@ -143,6 +153,7 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
   };
 
   const handleStart = async () => {
+    dispatch(troubleshooterActions.clear());
     setEmailEntered(true);
 
     const browserResult = shouldRunTest('browser')
@@ -184,6 +195,7 @@ export const TestModalContainer = ({ open, onClose }: ITestModalContainerProps) 
     };
 
     dispatch(submitTroubleshooterSession({ email, tests: testStatus }));
+    console.log('Submitting result...');
   };
 
   // Accepts state of the last running component; all previous ones set to pass
