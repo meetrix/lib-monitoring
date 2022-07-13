@@ -11,9 +11,9 @@ export const SOCKET_PATH = '/stats';
 
 export const API_KEY = process.env.API_KEY || '';
 export const turn = {
-  uri: process.env.TURN_URI || 'turn:openrelay.metered.ca:80',
-  username: process.env.TURN_USERNAME || 'openrelayproject',
-  credential: process.env.TURN_CREDENTIALS || 'openrelayproject',
+  uri: process.env.TURN_URI || 'turn:coturnwr.dev.meetrix.io:3478',
+  username: process.env.TURN_USERNAME || 'user',
+  credential: process.env.TURN_CREDENTIALS || 'X5jjSZ5a1d',
 };
 
 export const stun = {
