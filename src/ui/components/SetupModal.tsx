@@ -78,6 +78,12 @@ interface SetupModalProps extends WithStyles<ModalProps & typeof styles> {
 
 const SetupModal = (props: SetupModalProps) => {
   const [closeModal, setCloseModal] = useState<boolean>(props.open);
+
+  const handleCloseButton = () => {
+    setCloseModal(false);
+    window.close();
+  };
+
   return (
     <Modal
       open={closeModal}
@@ -90,7 +96,7 @@ const SetupModal = (props: SetupModalProps) => {
         <IconButton 
           aria-label="close" 
           className={props.classes.closeButton}
-          onClick={() => setCloseModal(false)}
+          onClick={handleCloseButton}
         >
           <CloseIcon fontSize="small" />
         </IconButton>
