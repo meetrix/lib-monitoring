@@ -106,7 +106,7 @@ export const TestModal: React.FC<TestModalProps> = ({
     if (open && status === '') {
       handleRetry?.();
     }
-  }, [handleRetry, open, status]);
+  }, [!!handleRetry, open, status]);
 
   return (
     <Modal
