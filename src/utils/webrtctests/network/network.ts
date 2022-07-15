@@ -220,7 +220,7 @@ const runNetworkTests = async (callback: TestEventCallback): Promise<boolean> =>
       callback(TestEvent.END, ['ipv6', 'failure']);
       callback(TestEvent.MESSAGE, ['ipv6', `[ FAILED ] Timed out`]);
     }
-    failure = !testPassed['ipv6'] || !testPassed['reflexive'] || !testPassed['host'];
+    failure = !testPassed['udp'] || !testPassed['tcp'];
   }, 15 * 1000);
   await sleep(15 * 1000);
 
