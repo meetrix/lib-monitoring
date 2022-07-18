@@ -166,19 +166,19 @@ const runConnectionTests = async (callback: TestEventCallback): Promise<boolean>
   setTimeout(() => {
     // Disable report function for other running code
     report = () => {};
-    if (testPassed['relay'] === undefined) {
+    if (testPassed.relay === undefined) {
       callback(TestEvent.END, ['relay', 'failure']);
       callback(TestEvent.MESSAGE, ['relay', `[ FAILED ] Timed out`]);
     }
-    if (testPassed['reflexive'] === undefined) {
+    if (testPassed.reflexive === undefined) {
       callback(TestEvent.END, ['reflexive', 'failure']);
       callback(TestEvent.MESSAGE, ['reflexive', `[ FAILED ] Timed out`]);
     }
-    if (testPassed['host'] === undefined) {
+    if (testPassed.host === undefined) {
       callback(TestEvent.END, ['host', 'failure']);
       callback(TestEvent.MESSAGE, ['host', `[ FAILED ] Timed out`]);
     }
-    failure = !testPassed['relay'] || !testPassed['reflexive'] || !testPassed['host'];
+    failure = ![testPassed.relay, testPassed.reflexive, testPassed.host].some(Boolean);
   }, 1 * 60 * 1000);
   await sleep(1 * 60 * 1000);
 
