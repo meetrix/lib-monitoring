@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import deriveOverallStatus from '../../../utils/webrtctests/deriveOverallStatus';
+import deriveOverallStatus, { Strategy } from '../../../utils/webrtctests/deriveOverallStatus';
 
 import { RootState } from '../../store/store';
 import { ISubMessages, ISubStatus, ITestState } from '../types';
@@ -77,7 +77,8 @@ export const connectionSlice = createSlice({
           break;
       }
       const subStatuses = [state.subStatus.relay, state.subStatus.reflexive, state.subStatus.host];
-      state.status = deriveOverallStatus(subStatuses);
+      // Pass on at least one success status
+      state.status = deriveOverallStatus(subStatuses, Strategy.OR);
     },
     endTest(state, action) {
       switch (action.payload[0]) {
@@ -95,7 +96,8 @@ export const connectionSlice = createSlice({
           break;
       }
       const subStatuses = [state.subStatus.relay, state.subStatus.reflexive, state.subStatus.host];
-      state.status = deriveOverallStatus(subStatuses);
+      // Pass on at least one success status
+      state.status = deriveOverallStatus(subStatuses, Strategy.OR);
     },
   },
   extraReducers(builder) {
