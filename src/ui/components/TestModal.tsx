@@ -58,6 +58,8 @@ function deriveStatus(data: ITestView[], testId?: string) {
     ? 'failure'
     : 'running';
 
+  console.log('[+]', data);
+
   let statusMessage = 'Tests not run';
   switch (status) {
     case 'success':

@@ -94,8 +94,8 @@ export const networkSlice = createSlice({
         default:
           break;
       }
-      const subStatuses = [state.subStatus.udp, state.subStatus.tcp, state.subStatus.ipv6];
-      state.status = deriveOverallStatus(subStatuses);
+      const subStatuses = [state.subStatus.udp, state.subStatus.tcp];
+      state.status = deriveOverallStatus(subStatuses, Strategy.AND, [state.subStatus.ipv6]);
     },
   },
   extraReducers(builder) {
