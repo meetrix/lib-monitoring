@@ -6,6 +6,10 @@
 
     <body>
 
+      Enter pluginId here, save and refresh.
+      <input id="pluginId" name="pluginId" type="text">
+      <button onclick="javascript:localStorage.setItem('pluginId', document.getElementById('pluginId').value)">Save</button>
+
       <div id="localVideo"></div>
       <div id="remoteVideo"></div>
 
@@ -18,7 +22,7 @@
 
       <script src="browser.js"></script>
       <script>
-        window.rtcMonitor = new Monitor({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwbHVnaW4iOnRydWUsImRvbWFpbiI6Im1lZXRyaXguaW8iLCJpYXQiOjE2NDA0OTQwMTAsImV4cCI6MTcyNjg5NDAxMCwic3ViIjoiNjFjNmYyNjZjNzU5MjAzMGRiYzViN2EwIn0.lF8zZMj--pOLslgpbP0LjC4FVotEOPQW-rN_2kucJCM' });
+        window.rtcMonitor = new Monitor({ token: localStorage.getItem('pluginId')});
       </script>
 
       <script>
