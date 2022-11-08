@@ -1,13 +1,14 @@
 {
   "name": "@meetrix/lib-monitoring",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "",
   "keywords": [],
   "types": "./dist/lib/lib-call-quality-monitoring.d.ts",
   "main": "./dist/lib/lib-call-quality-monitoring.js",
   "exports": {
     ".": {
-      "require": "./dist/lib/lib-call-quality-monitoring.js"
+      "require": "./dist/lib/lib-call-quality-monitoring.js",
+      "import": "./dist/lib/lib-call-quality-monitoring.js"
     }
   },
   "browser": "./dist/browser.js",
