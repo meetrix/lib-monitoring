@@ -68,18 +68,20 @@ export default class Monitor {
 
     events.forEach(eventType => {
       this.stats.on(eventType, async (event: TimelineEvent) => {
-        if (event.event === 'stats' && event.data.outbound) {
-          for (let stream of event.data.outbound) {
-            if (stream.kind == 'video') {
-              // if (stream.qualityLimitationReason != 'null') {
-              const report = await getReportFromTimelineEvent(event);
-              debug('---- stats ----', report);
-              if (this.api) {
-                this.api.report(report);
+        if (event.event === 'stats') {
+          if (event.data.outbound) {
+            for (let stream of event.data.outbound) {
+              if (stream.kind == 'video') {
+                if (stream.qualityLimitationReason != 'null') {
+                  const report = await getReportFromTimelineEvent(event);
+                  debug('---- stats ----', report);
+                  if (this.api) {
+                    this.api.report(report);
+                  }
+                  handleReport(report);
+                  break;
+                }
               }
-              handleReport(report);
-              // }
-              break;
             }
           }
         } else if (event.event === 'onconnectionstatechange') {
