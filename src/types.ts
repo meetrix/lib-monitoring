@@ -2,6 +2,10 @@ import { TimelineEvent, TrackReport } from '@peermetrics/webrtc-stats';
 export { ApiOptions } from '../src/utils/API';
 export interface MonitoringConstructorOptions {
   token: string;
+  participantJid?: string;
+  participantName?: string;
+  roomJid?: string;
+  roomName?: string;
   clientId?: string;
   baseUrl?: string;
 }
