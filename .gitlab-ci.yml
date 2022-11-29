@@ -124,7 +124,7 @@ branch_build:
       fi
     - echo "Created the following .npmrc:"; cat .npmrc
     # Build, using the cache if available
-    - CI=false npm install
+    - CI=false npm ci --cache .npm --prefer-offline
     - cd node_modules/@peermetrics/webrtc-stats && npm install && npm run build
     - cd ../../.. && npm run build
   artifacts:
