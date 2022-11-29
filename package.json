@@ -1,6 +1,6 @@
 {
   "name": "@meetrix/lib-monitoring",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "",
   "keywords": [],
   "types": "./dist/lib/lib-call-quality-monitoring.d.ts",
