@@ -32,7 +32,7 @@ production_build:
     # Build, using the cache if available
     #- CI=false npm ci --cache .npm --prefer-offline
     - CI=false NODE_ENV=development npm install
-    - cd node_modules/@peermetrics/webrtc-stats && npm install && npm run build
+    - cd node_modules/@peermetrics/webrtc-stats && NODE_ENV=development npm install && npm run build
     - cd ../../.. && npm run build
   artifacts:
     paths:
