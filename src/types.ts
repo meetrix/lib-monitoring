@@ -106,3 +106,9 @@ export interface StatsObjectCustom {
 export interface Peer extends StatsObjectCustom {
   peerId: string;
 }
+
+declare global {
+  interface Window {
+    _env_: any;
+  }
+}

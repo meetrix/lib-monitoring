@@ -32,10 +32,10 @@ export default class Monitor {
   constructor(options: MonitoringConstructorOptions) {
     const {
       token: _token,
-      participantJid = '1',
-      participantName = '1',
-      roomJid = '1',
-      roomName = '1',
+      participantJid,
+      participantName,
+      roomJid,
+      roomName,
       clientId: _clientId,
       baseUrl = BACKEND_URL,
     } = options || {};
