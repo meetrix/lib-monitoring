@@ -132,7 +132,6 @@
     "prettier": "^1.19.1",
     "prompt": "^1.0.0",
     "replace-in-file": "^3.4.2",
-    "rimraf": "^2.6.2",
     "semantic-release": "^15.9.16",
     "shelljs": "^0.8.3",
     "travis-deploy-once": "^5.0.9",
@@ -173,6 +172,7 @@
     "socket.io-client": "^4.4.0",
     "unistore": "^3.5.2",
     "uuid": "^8.3.2",
-    "webrtc-adapter": "^8.1.1"
+    "webrtc-adapter": "^8.1.1",
+    "rimraf": "^2.6.2"
   }
 }
