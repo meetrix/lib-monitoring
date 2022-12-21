@@ -4,12 +4,12 @@ variables:
   STAGING_SSH_USER: $STAGING_SSH_USER
   STAGING_SSH_HOST: $STAGING_SSH_HOST
 
-cache:
-  key:
-    files:
-      - package-lock.json
-  paths:
-    - .npm/
+# cache:
+#   key:
+#     files:
+#       - package-lock.json
+#   paths:
+#     - .npm/
 
 production_build:
   image: node:12
