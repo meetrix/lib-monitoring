@@ -18,7 +18,10 @@ const allowedEnvVariables = [
   'TURN_URI',
   'TURN_USERNAME',
   'TURN_CREDENTIALS',
-  'STUN_URI'
+  'STUN_URI',
+  'REACT_APP_ENVIRONMENT',
+  'REACT_APP_API_BASE_URL',
+  'PUBLIC_URL'
 ];
 
 const config = {
