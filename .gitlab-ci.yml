@@ -30,7 +30,8 @@ production_build:
       fi
     - echo "Created the following .npmrc:"; cat .npmrc
     # Build, using the cache if available
-    - CI=false npm ci --cache .npm --prefer-offline
+    #- CI=false npm ci --cache .npm --prefer-offline
+    - CI=false npm install
     - cd node_modules/@peermetrics/webrtc-stats && npm install && npm run build
     - cd ../../.. && npm run build
   artifacts:
