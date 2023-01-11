@@ -18,7 +18,9 @@ const allowedEnvVariables = [
   'TURN_URI',
   'TURN_USERNAME',
   'TURN_CREDENTIALS',
-  'STUN_URI'
+  'STUN_URI',
+  'API_BASE_URL',
+  'PUBLIC_URL'
 ];
 
 const config = {

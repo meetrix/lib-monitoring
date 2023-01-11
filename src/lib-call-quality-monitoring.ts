@@ -30,7 +30,15 @@ export default class Monitor {
   clientId: string;
 
   constructor(options: MonitoringConstructorOptions) {
-    const { token: _token, clientId: _clientId, baseUrl = BACKEND_URL } = options || {};
+    const {
+      token: _token,
+      participantJid,
+      participantName,
+      roomJid,
+      roomName,
+      clientId: _clientId,
+      baseUrl = BACKEND_URL,
+    } = options || {};
     // allow overriding via url parameters
     const { clientId: urlClientId, token: urlToken } = getUrlParams();
     const clientId = urlClientId || _clientId || getClientId();
@@ -66,24 +74,42 @@ export default class Monitor {
 
     getClientId();
 
+    const clientInfo = {
+      participantJid,
+      participantName,
+      roomJid,
+      roomName,
+    };
+
     events.forEach(eventType => {
       this.stats.on(eventType, async (event: TimelineEvent) => {
         if (event.event === 'stats') {
+          console.log(event);
+          // if (event.data.outbound) {
+          //   for (let stream of event.data.outbound) {
+          //     if (stream.kind == 'video') {
+          //if (stream.qualityLimitationReason != 'null') {
           const report = await getReportFromTimelineEvent(event);
           debug('---- stats ----', report);
           if (this.api) {
-            this.api.report(report);
+            this.api.report({ ...clientInfo, ...report });
           }
           handleReport(report);
+          // break;
+          //}
+          // }
+          // }
+          // }
         } else if (event.event === 'onconnectionstatechange') {
           debug('---- onconnectionstatechange ----', event);
+          debug({ ...clientInfo, ...event });
           if (this.api) {
-            this.api.connectionStats(event);
+            this.api.connectionStats({ ...clientInfo, ...event });
           }
         } else {
           debug('---- other ----', event);
           if (this.api) {
-            this.api.otherStats(event);
+            this.api.otherStats({ ...clientInfo, ...event });
           }
         }
       });
