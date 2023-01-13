@@ -35,8 +35,9 @@ production_build:
     # Build, using the cache if available
     #- CI=false npm ci --cache .npm --prefer-offline
     - CI=false npm ci --also=dev
-    - cd node_modules/@peermetrics/webrtc-stats && npm i --also=dev && npm run build
-    - cd ../../.. && npm run build
+    - cd node_modules/@peermetrics/webrtc-stats && npm i --also=dev && npm run build && cd ../../..
+    - cd node_modules/@meetrix/webrtc-monitoring-common-lib/ && npm i --also=dev && npm run build && cd ../../..
+    - npm run build
   artifacts:
     paths:
       - dist
@@ -133,8 +134,9 @@ branch_build:
     # Build, using the cache if available
     #- CI=false npm ci --cache .npm --prefer-offline
     - CI=false npm ci --also=dev
-    - cd node_modules/@peermetrics/webrtc-stats && npm i --also=dev && npm run build
-    - cd ../../.. && npm run build
+    - cd node_modules/@peermetrics/webrtc-stats && npm i --also=dev && npm run build && cd ../../..
+    - cd node_modules/@meetrix/webrtc-monitoring-common-lib/ && npm i --also=dev && npm run build && cd ../../..
+    - npm run build
   artifacts:
     paths:
       - dist
