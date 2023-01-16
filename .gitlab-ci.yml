@@ -12,7 +12,7 @@ variables:
 #     - .npm/
 
 production_build:
-  image: node:16
+  image: node:16-bullseye-slim
   stage: build
   environment:
     name: production
@@ -44,7 +44,7 @@ production_build:
       - dist
 
 production_publish:
-  image: node:16
+  image: node:16-bullseye-slim
   stage: deploy
   environment:
     name: production
@@ -109,7 +109,7 @@ production_deploy:
     - ssh $STAGING_SSH_USER@$STAGING_SSH_HOST "cd /var/www/lib-monitoring && ln -sfn releases/$CI_PIPELINE_ID current"
 
 branch_build:
-  image: node:16
+  image: node:16-bullseye-slim
   stage: build
   environment:
     name: staging
@@ -144,7 +144,7 @@ branch_build:
       - dist
 
 branch_publish:
-  image: node:16
+  image: node:16-bullseye-slim
   stage: deploy
   environment:
     name: staging
